@@ -18,38 +18,38 @@ FFMPEG_URL = (
 )
 
 
-def descargar_archivo(url: str, destino: Path):
-    print(f"Descargando: {url}")
+def download_file(url: str, destination: Path):
+    print(f"Downloading: {url}")
 
     try:
         with urllib.request.urlopen(url) as response:
-            with open(destino, "wb") as f:
+            with open(destination, "wb") as f:
                 shutil.copyfileobj(response, f)
 
     except Exception as e:
         raise RuntimeError(
-            f"Error descargando {url}\n{e}"
+            f"Error downloading {url}\n{e}"
         ) from e
 
 
-def instalar_ytdlp():
-    destino = ENV_DIR / "yt-dlp.exe"
+def install_ytdlp():
+    destination = ENV_DIR / "yt-dlp.exe"
 
-    print("Instalando yt-dlp...")
-    descargar_archivo(YTDLP_URL, destino)
+    print("Installing yt-dlp...")
+    download_file(YTDLP_URL, destination)
 
-    print("yt-dlp actualizado.")
+    print("yt-dlp updated.")
 
 
-def instalar_ffmpeg():
-    print("Instalando FFmpeg...")
+def install_ffmpeg():
+    print("Installing FFmpeg...")
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
 
         zip_path = tmpdir / "ffmpeg.zip"
 
-        descargar_archivo(FFMPEG_URL, zip_path)
+        download_file(FFMPEG_URL, zip_path)
 
         try:
             with zipfile.ZipFile(zip_path, "r") as zf:
@@ -69,7 +69,7 @@ def instalar_ffmpeg():
 
                 if not ffmpeg_member or not ffprobe_member:
                     raise RuntimeError(
-                        "No se encontraron ffmpeg.exe o ffprobe.exe dentro del ZIP."
+                        "ffmpeg.exe or ffprobe.exe were not found inside the ZIP."
                     )
 
                 zf.extract(ffmpeg_member, tmpdir)
@@ -87,14 +87,14 @@ def instalar_ffmpeg():
 
         except zipfile.BadZipFile as e:
             raise RuntimeError(
-                "El ZIP de FFmpeg está corrupto."
+                "The FFmpeg ZIP file is corrupted."
             ) from e
 
-    print("FFmpeg actualizado.")
+    print("FFmpeg updated.")
 
 
-def actualizar_path_usuario():
-    ruta = str(ENV_DIR)
+def update_user_path():
+    path = str(ENV_DIR)
 
     try:
         key = winreg.OpenKey(
@@ -105,39 +105,39 @@ def actualizar_path_usuario():
         )
 
         try:
-            path_actual, _ = winreg.QueryValueEx(key, "Path")
+            current_path, _ = winreg.QueryValueEx(key, "Path")
         except FileNotFoundError:
-            path_actual = ""
+            current_path = ""
 
-        rutas = [p.strip() for p in path_actual.split(";") if p.strip()]
+        paths = [p.strip() for p in current_path.split(";") if p.strip()]
 
-        if ruta.lower() not in [p.lower() for p in rutas]:
-            rutas.append(ruta)
+        if path.lower() not in [p.lower() for p in paths]:
+            paths.append(path)
 
-            nuevo_path = ";".join(rutas)
+            new_path = ";".join(paths)
 
             winreg.SetValueEx(
                 key,
                 "Path",
                 0,
                 winreg.REG_EXPAND_SZ,
-                nuevo_path
+                new_path
             )
 
-            print("PATH actualizado.")
+            print("PATH updated.")
 
         else:
-            print("La ruta ya existe en PATH.")
+            print("Path already exists in PATH.")
 
         winreg.CloseKey(key)
 
     except PermissionError:
         raise RuntimeError(
-            "No se pudo modificar el PATH del usuario."
+            "Could not modify user PATH."
         )
 
 
-def refrescar_entorno():
+def refresh_environment():
     HWND_BROADCAST = 0xFFFF
     WM_SETTINGCHANGE = 0x001A
     SMTO_ABORTIFHUNG = 0x0002
@@ -152,20 +152,20 @@ def refrescar_entorno():
         None
     )
 
-    print("Variables de entorno refrescadas.")
+    print("Environment variables refreshed.")
 
 
 def main():
     try:
         ENV_DIR.mkdir(exist_ok=True)
 
-        instalar_ytdlp()
-        instalar_ffmpeg()
+        install_ytdlp()
+        install_ffmpeg()
 
-        actualizar_path_usuario()
-        refrescar_entorno()
+        update_user_path()
+        refresh_environment()
 
-        print("\nInstalación completada.")
+        print("\nInstallation completed.")
 
     except Exception as e:
         print(f"\nERROR:\n{e}")
