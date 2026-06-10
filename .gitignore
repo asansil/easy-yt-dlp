@@ -12,6 +12,7 @@ env/
 dist/
 build/
 assets/
+tmp/
 *.spec
 *.egg-info/
 
