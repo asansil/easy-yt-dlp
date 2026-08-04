@@ -17,14 +17,45 @@ FFMPEG_URL = (
     "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
 )
 
+DOWNLOAD_TIMEOUT = 30
+CHUNK_SIZE = 64 * 1024
+
 
 def download_file(url: str, destination: Path):
     print(f"Downloading: {url}")
 
     try:
-        with urllib.request.urlopen(url) as response:
+        with urllib.request.urlopen(url, timeout=DOWNLOAD_TIMEOUT) as response:
+            total_size = int(response.headers.get("Content-Length", 0))
+            downloaded = 0
+
             with open(destination, "wb") as f:
-                shutil.copyfileobj(response, f)
+                while True:
+                    chunk = response.read(CHUNK_SIZE)
+                    if not chunk:
+                        break
+
+                    f.write(chunk)
+                    downloaded += len(chunk)
+
+                    downloaded_mb = downloaded / 1_048_576
+
+                    if total_size:
+                        percent = downloaded * 100 // total_size
+                        total_mb = total_size / 1_048_576
+                        print(
+                            f"\r  {downloaded_mb:.1f} MB / {total_mb:.1f} MB ({percent}%)",
+                            end="",
+                            flush=True,
+                        )
+                    else:
+                        print(
+                            f"\r  {downloaded_mb:.1f} MB downloaded",
+                            end="",
+                            flush=True,
+                        )
+
+            print()
 
     except Exception as e:
         raise RuntimeError(
