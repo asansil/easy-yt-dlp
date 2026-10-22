@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 import easy_ytdlp
+from easy_ytdlp.core import paths
 
 PYPROJECT = Path(__file__).resolve().parents[2] / "pyproject.toml"
 QT_FREE_PACKAGES = ["easy_ytdlp.core", "easy_ytdlp.tools", "easy_ytdlp.updater"]
@@ -25,6 +26,21 @@ def test_package_does_not_import_pyside6(package: str) -> None:
     assert result.returncode == 0, f"{package} imports PySide6"
 
 
-def test_main_module_runs() -> None:
-    main = importlib.import_module("easy_ytdlp.__main__").main
-    assert main() == 0
+def test_version_flag(capsys: pytest.CaptureFixture[str]) -> None:
+    main = importlib.import_module("easy_ytdlp.app").main
+    assert main(["--version"]) == 0
+    assert easy_ytdlp.__version__ in capsys.readouterr().out
+
+
+def test_self_test_flag() -> None:
+    # A fresh interpreter, like the frozen app, with the data folder from conftest.
+    result = subprocess.run(
+        [sys.executable, "-m", "easy_ytdlp", "--self-test"],
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=120,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "self-test: OK" in result.stdout
+    assert paths.logs_dir().is_dir()
