@@ -29,8 +29,6 @@ testpaths = ["tests"]
 target-version = "py312"
 line-length = 100
 src = ["src", "tests"]
-# v1 scripts, kept until M1 ports them to easy_ytdlp/tools.
-extend-exclude = ["src/updater_installer.py", "src/yt_dlp_interface.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
