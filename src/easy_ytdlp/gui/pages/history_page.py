@@ -45,7 +45,13 @@ class HistoryPage(Page):
         self.state.addItem(self.tr("All"), "")
         for state in (JobState.DONE, JobState.FAILED, JobState.CANCELLED):
             self.state.addItem(state_text(state), state.value)
+        search_label = label(self.tr("Search"), "Muted")
+        search_label.setBuddy(self.search)
+        state_label = label(self.tr("State"), "Muted")
+        state_label.setBuddy(self.state)
+        filters.addWidget(search_label)
         filters.addWidget(self.search, 1)
+        filters.addWidget(state_label)
         filters.addWidget(self.state)
         self.body.addLayout(filters)
 

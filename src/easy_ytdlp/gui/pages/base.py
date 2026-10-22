@@ -17,9 +17,11 @@ class Page(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
+        scroll.setObjectName("PageScroll")
         outer.addWidget(scroll)
 
         holder = QWidget()
+        holder.setObjectName("PageHolder")
         row = QHBoxLayout(holder)
         row.setContentsMargins(32, 24, 32, 32)
         column = QWidget()

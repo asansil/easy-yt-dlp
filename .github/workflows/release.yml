@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Tag matches the package version
+        run: uv run --frozen python scripts/release_notes.py check-tag "${{ github.ref_name }}"
+
+  # Same build and install smoke test as pull requests: the release ships exactly what passed.
+  build:
+    needs: check
+    uses: ./.github/workflows/build.yml
+
+  publish:
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: setup
+          path: release
+
+      - name: Release notes from CHANGELOG.md
+        shell: pwsh
+        run: uv run --frozen python scripts/release_notes.py notes "${{ github.ref_name }}" | Out-File -Encoding utf8 notes.md
+
+      - name: Create the GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $flags = @()
+          if ($tag -match "-(alpha|beta|rc|dev)") { $flags += "--prerelease" }
+          $files = Get-ChildItem release -File | ForEach-Object { $_.FullName }
+          gh release create $tag @files --title "Easy yt-dlp $tag" --notes-file notes.md @flags

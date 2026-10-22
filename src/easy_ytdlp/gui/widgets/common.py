@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from easy_ytdlp.gui import theme
 from easy_ytdlp.gui.theme import icons
 
 
@@ -216,7 +217,10 @@ class Toast(QLabel):
         self.raise_()
         self.show()
         self._fade.stop()
-        self._fade.setStartValue(0.0)
-        self._fade.setEndValue(1.0)
-        self._fade.start()
+        if theme.animations_enabled():
+            self._fade.setStartValue(0.0)
+            self._fade.setEndValue(1.0)
+            self._fade.start()
+        else:
+            self._effect.setOpacity(1.0)
         self._timer.start(self.DURATION_MS)

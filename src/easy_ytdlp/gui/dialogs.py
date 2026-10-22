@@ -46,7 +46,7 @@ class FirstRunDialog(QDialog):
                 self.tr(
                     "To download, Easy yt-dlp needs three free tools: yt-dlp (the downloader), "
                     "FFmpeg (to merge and convert) and deno (needed by YouTube). They are "
-                    "downloaded from their official sites and checked before use (about 120 MB)."
+                    "downloaded from their official sites and checked before use (about 180 MB)."
                 ),
                 "Muted",
                 wrap=True,

@@ -1,6 +1,6 @@
 [project]
 name = "easy-ytdlp"
-version = "2.0.0.dev0"
+version = "2.0.0b1"
 description = "A Windows desktop app that makes yt-dlp comfortable to use."
 readme = "README.md"
 license = "MIT"
@@ -24,6 +24,9 @@ packages = ["src/easy_ytdlp"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Real downloads run only on demand (pytest -m e2e) and in e2e-weekly.yml.
+addopts = "-m 'not e2e'"
+markers = ["e2e: real downloads over the network"]
 
 [tool.ruff]
 target-version = "py312"

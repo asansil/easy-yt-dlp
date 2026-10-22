@@ -14,7 +14,7 @@ _TEMPLATE = Template(
     font-size: ${body}px;
     color: $foreground;
 }
-QMainWindow, QDialog, #Page, QStackedWidget, QScrollArea, QScrollArea > QWidget > QWidget {
+QMainWindow, QDialog, #Page, #MainStack, #PageScroll, #PageHolder {
     background: $background;
 }
 QToolTip {

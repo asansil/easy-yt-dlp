@@ -46,7 +46,7 @@ class ToolsBanner(QFrame):
             )
             self.detail.setText(
                 self.tr(
-                    "They are downloaded from their official sources and verified (about 120 MB)."
+                    "They are downloaded from their official sources and verified (about 180 MB)."
                 )
             )
 

@@ -1,5 +1,7 @@
 """Theme: tokens, stylesheet, fonts, icons and light/dark switching."""
 
+import ctypes
+import sys
 from pathlib import Path
 
 from PySide6.QtCore import QObject, Qt, Signal
@@ -92,3 +94,15 @@ class ThemeManager(QObject):
     def _on_system_change(self, *_args: object) -> None:
         if self._mode == "system":
             self.apply()
+
+
+def animations_enabled() -> bool:
+    """False when Windows "Animation effects" (Accessibility > Visual effects) is off."""
+    if sys.platform != "win32":
+        return True
+    spi_getclientareaanimation = 0x1042
+    value = ctypes.c_int(1)
+    ok = ctypes.windll.user32.SystemParametersInfoW(  # type: ignore[attr-defined]
+        spi_getclientareaanimation, 0, ctypes.byref(value), 0
+    )
+    return bool(value.value) if ok else True

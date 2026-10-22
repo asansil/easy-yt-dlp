@@ -1,5 +1,6 @@
 """Run a blocking function in the thread pool and get its result as a Qt signal."""
 
+import contextlib
 import logging
 from collections.abc import Callable
 from typing import Any
@@ -26,9 +27,15 @@ class _Task(QRunnable):
             result = self.fn()
         except Exception as exc:
             log.debug("Background task failed", exc_info=True)
-            self.signals.failed.emit(exc)
+            self._emit(self.signals.failed, exc)
         else:
-            self.signals.done.emit(result)
+            self._emit(self.signals.done, result)
+
+    @staticmethod
+    def _emit(signal, value: Any) -> None:
+        # The receiver may be gone when the app quits while a task is still running.
+        with contextlib.suppress(RuntimeError):
+            signal.emit(value)
 
 
 # Keep the signal objects alive until their task has reported back.

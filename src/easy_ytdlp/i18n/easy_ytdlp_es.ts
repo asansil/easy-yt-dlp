@@ -352,8 +352,8 @@
         <translation>Bienvenido a Easy yt-dlp</translation>
     </message>
     <message>
-        <source>To download, Easy yt-dlp needs three free tools: yt-dlp (the downloader), FFmpeg (to merge and convert) and deno (needed by YouTube). They are downloaded from their official sites and checked before use (about 120 MB).</source>
-        <translation>Para descargar, Easy yt-dlp necesita tres herramientas gratuitas: yt-dlp (el descargador), FFmpeg (para unir y convertir) y deno (necesario para YouTube). Se descargan de sus sitios oficiales y se verifican antes de usarlas (unos 120 MB).</translation>
+        <source>To download, Easy yt-dlp needs three free tools: yt-dlp (the downloader), FFmpeg (to merge and convert) and deno (needed by YouTube). They are downloaded from their official sites and checked before use (about 180 MB).</source>
+        <translation>Para descargar, Easy yt-dlp necesita tres herramientas gratuitas: yt-dlp (el descargador), FFmpeg (para unir y convertir) y deno (necesario para YouTube). Se descargan de sus sitios oficiales y se verifican antes de usarlas (unos 180 MB).</translation>
     </message>
     <message>
         <source>Pending</source>
@@ -448,6 +448,10 @@
         <translation>Estado</translation>
     </message>
     <message>
+        <source>Search</source>
+        <translation>Buscar</translation>
+    </message>
+    <message>
         <source>Date</source>
         <translation>Fecha</translation>
     </message>
@@ -509,6 +513,14 @@
     <message>
         <source>Select</source>
         <translation>Seleccionar</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Buscar</translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation>Elementos</translation>
     </message>
     <message>
         <source>Only the first {shown} of {count} items were listed.</source>
@@ -1084,8 +1096,8 @@
         <translation>Easy yt-dlp necesita estas herramientas gratuitas para descargar: {tools}.</translation>
     </message>
     <message>
-        <source>They are downloaded from their official sources and verified (about 120 MB).</source>
-        <translation>Se descargan de sus fuentes oficiales y se verifican (unos 120 MB).</translation>
+        <source>They are downloaded from their official sources and verified (about 180 MB).</source>
+        <translation>Se descargan de sus fuentes oficiales y se verifican (unos 180 MB).</translation>
     </message>
     <message>
         <source>Downloading {tool}…</source>

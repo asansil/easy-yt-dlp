@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
         banner_holder.addWidget(self.banner)
         right.addLayout(banner_holder)
         self.stack = QStackedWidget()
+        self.stack.setObjectName("MainStack")
         right.addWidget(self.stack, 1)
         root.addLayout(right, 1)
 

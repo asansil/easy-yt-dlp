@@ -215,14 +215,14 @@ class OutputSection(Section):
         self.reset = button(self.tr("Reset"), "rotate-ccw", variant="ghost")
         template_row.addWidget(self.template, 1)
         template_row.addWidget(self.reset)
-        chips = QHBoxLayout()
+        chips = QGridLayout()
         chips.setSpacing(4)
-        for name, token in TEMPLATE_TOKENS:
+        for position, (name, token) in enumerate(TEMPLATE_TOKENS):
             chip = button(name, variant="ghost")
             chip.setToolTip(self.tr("Insert {token}").format(token=token))
             chip.clicked.connect(lambda _=False, token=token: self.template.insert(token))
-            chips.addWidget(chip)
-        chips.addStretch(1)
+            chips.addWidget(chip, position // 4, position % 4)
+        chips.setColumnStretch(4, 1)
         self.organize = QComboBox()
         for value, text in (
             (Organize.NONE, self.tr("No subfolders")),
