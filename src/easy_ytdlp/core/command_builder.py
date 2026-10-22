@@ -226,3 +226,16 @@ def parse_manual(text: str, *, ytdlp: Path | None = None) -> list[str]:
     if not args:
         raise ManualCommandError("no arguments")
     return [str(ytdlp or paths.ytdlp_exe()), *progress.MACHINE_FLAGS, *args]
+
+
+def manual_argv(
+    text: str, *, url: str = "", folder: str = "", ytdlp: Path | None = None
+) -> list[str]:
+    """Command-mode argv: the folder goes before the user's arguments (so their own ``-P``
+    wins) and the optional URL goes last, after ``--``."""
+    argv = parse_manual(text, ytdlp=ytdlp)
+    head, user = argv[: 1 + len(progress.MACHINE_FLAGS)], argv[1 + len(progress.MACHINE_FLAGS) :]
+    if folder.strip():
+        head += ["-P", folder.strip()]
+    tail = ["--", url.strip()] if url.strip() else []
+    return [*head, *user, *tail]

@@ -78,7 +78,7 @@ class Runner(Protocol):
 type RunnerFactory = Callable[[list[str], Callable[[str], None], Callable[[int], None]], Runner]
 
 
-def _default_runner(
+def default_runner(
     argv: list[str], on_line: Callable[[str], None], on_exit: Callable[[int], None]
 ) -> Runner:
     return ProcessRunner(argv, on_line, on_exit)
@@ -89,7 +89,7 @@ class DownloadQueue:
         self,
         max_concurrent: int = 2,
         *,
-        runner_factory: RunnerFactory = _default_runner,
+        runner_factory: RunnerFactory = default_runner,
         on_change: Callable[[Job], None] | None = None,
         on_log: Callable[[Job, str], None] | None = None,
         on_finished: Callable[[Job], None] | None = None,

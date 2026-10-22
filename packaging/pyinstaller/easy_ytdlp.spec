@@ -50,9 +50,9 @@ version_info = VSVersionInfo(
 )
 
 datas = copy_metadata("easy-ytdlp")
-for folder in ("resources", "i18n"):
-    if (SRC / folder).is_dir():
-        datas.append((str(SRC / folder), f"easy_ytdlp/{folder}"))
+datas.append((str(SRC / "resources"), "easy_ytdlp/resources"))
+# Only the compiled translations; packaging/build.ps1 builds them from the .ts sources.
+datas += [(str(qm), "easy_ytdlp/i18n") for qm in (SRC / "i18n").glob("*.qm")]
 
 a = Analysis(  # noqa: F821
     [str(Path(SPECPATH) / "launcher.py")],  # noqa: F821

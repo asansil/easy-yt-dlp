@@ -33,19 +33,24 @@ def self_test() -> int:
     """Start Qt offscreen, build the main window, check the folders; exit code 0 on success."""
     os.environ["QT_QPA_PLATFORM"] = "offscreen"
     try:
-        from PySide6.QtWidgets import QApplication
-
         from easy_ytdlp.core import command_builder, options, probe, queue, settings  # noqa: F401
-        from easy_ytdlp.gui.main_window import MainWindow
 
         paths.ensure_dirs()
         probe_file = paths.data_dir() / ".self-test"
         probe_file.write_text("ok", encoding="utf-8")
         probe_file.unlink()
 
-        app = QApplication.instance() or QApplication([sys.argv[0]])
-        window = MainWindow()
-        window.close()
+        app = create_application()
+        from easy_ytdlp.gui.context import AppContext
+        from easy_ytdlp.gui.main_window import MainWindow
+
+        ctx = AppContext(persist=False)
+        ctx.theme.apply()
+        window = MainWindow(ctx)
+        window.show()
+        app.processEvents()
+        window.ctx.queue.shutdown()
+        window.hide()
         app.processEvents()
     except Exception:
         log.exception("Self-test failed")
@@ -56,16 +61,31 @@ def self_test() -> int:
     return 0
 
 
-def run_gui() -> int:
+def create_application():
+    """The QApplication with the app identity and the bundled fonts."""
     from PySide6.QtWidgets import QApplication
 
-    from easy_ytdlp.gui.main_window import MainWindow
+    from easy_ytdlp.gui import theme
 
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setOrganizationName(ORG_NAME)
     app.setApplicationVersion(__version__)
-    window = MainWindow()
+    theme.load_fonts()
+    return app
+
+
+def run_gui() -> int:
+    app = create_application()
+    from easy_ytdlp.gui import i18n
+    from easy_ytdlp.gui.context import AppContext
+    from easy_ytdlp.gui.main_window import MainWindow
+
+    paths.ensure_dirs()
+    ctx = AppContext()
+    i18n.install(ctx.settings.language)
+    ctx.theme.apply()
+    window = MainWindow(ctx)
     window.show()
     return app.exec()
 

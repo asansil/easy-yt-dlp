@@ -257,3 +257,12 @@ def test_parse_manual_adds_machine_flags_and_strips_program() -> None:
 def test_parse_manual_empty() -> None:
     with pytest.raises(cb.ManualCommandError):
         cb.parse_manual("  yt-dlp ")
+
+
+def test_manual_argv_with_folder_and_url() -> None:
+    argv = cb.manual_argv("-x --audio-format mp3", url=" U ", folder=r"D:\Music", ytdlp=YTDLP)
+    assert cb.user_args(argv) == ["-P", r"D:\Music", "-x", "--audio-format", "mp3", "--", "U"]
+
+
+def test_manual_argv_without_extras() -> None:
+    assert cb.user_args(cb.manual_argv("-F URL", ytdlp=YTDLP)) == ["-F", "URL"]
