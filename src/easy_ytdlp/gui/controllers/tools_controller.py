@@ -77,7 +77,7 @@ class ToolsController(QObject):
             self.failed.emit("", str(exc))
             self.finished.emit(False)
 
-        run_async(work, done, error)
+        run_async(work, done, error, owner=self)
 
     def cancel(self) -> None:
         self._cancel.set()
@@ -96,4 +96,9 @@ class ToolsController(QObject):
                     result.append((tool.name, str(exc)))
             return result
 
-        run_async(work, self.statuses.emit, lambda exc: self.statuses.emit([("", str(exc))]))
+        run_async(
+            work,
+            self.statuses.emit,
+            lambda exc: self.statuses.emit([("", str(exc))]),
+            owner=self,
+        )

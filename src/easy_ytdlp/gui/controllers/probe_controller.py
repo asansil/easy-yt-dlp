@@ -45,7 +45,7 @@ class ProbeController(QObject):
             else:
                 self.failed.emit(url, str(exc), "")
 
-        run_async(lambda: self._analyze(url), done, error)
+        run_async(lambda: self._analyze(url), done, error, owner=self)
 
     def cancel(self) -> None:
         """Forget the running request; its result will be ignored."""

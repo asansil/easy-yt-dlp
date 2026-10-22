@@ -4,6 +4,7 @@ import logging
 from collections.abc import Callable
 from typing import Any
 
+import shiboken6
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal
 
 log = logging.getLogger(__name__)
@@ -38,13 +39,20 @@ def run_async(
     fn: Callable[[], Any],
     on_done: Callable[[Any], None] | None = None,
     on_error: Callable[[Exception], None] | None = None,
+    *,
+    owner: QObject | None = None,
 ) -> TaskSignals:
-    """Run ``fn`` in a worker thread; the callbacks run in the GUI thread."""
+    """Run ``fn`` in a worker thread; the callbacks run in the GUI thread.
+
+    With ``owner``, the callbacks are skipped once that object has been deleted.
+    """
     signals = TaskSignals()
     _pending.add(signals)
 
     def finish(callback: Callable[[Any], None] | None, value: Any) -> None:
         _pending.discard(signals)
+        if owner is not None and not shiboken6.isValid(owner):
+            return
         if callback is not None:
             callback(value)
 

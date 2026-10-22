@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QFormLayout,
     QHBoxLayout,
+    QInputDialog,
     QLineEdit,
     QPlainTextEdit,
     QStackedWidget,
@@ -26,6 +27,7 @@ from easy_ytdlp.core.options import (
     Mode,
     validate,
 )
+from easy_ytdlp.core.presets import PresetError
 from easy_ytdlp.core.probe import MediaInfo
 from easy_ytdlp.gui import messages
 from easy_ytdlp.gui.context import AppContext
@@ -41,7 +43,14 @@ from easy_ytdlp.gui.widgets.common import (
     label,
     set_state,
 )
+from easy_ytdlp.gui.widgets.item_picker import ItemPicker
 from easy_ytdlp.gui.widgets.media_card import MediaCard
+from easy_ytdlp.gui.widgets.option_sections import (
+    AdvancedSection,
+    ClipSection,
+    OutputSection,
+    SubtitleSection,
+)
 
 URL_RE = re.compile(r"^\s*https?://\S+\s*$", re.IGNORECASE)
 ANALYZE_DELAY_MS = 500
@@ -65,13 +74,21 @@ class DownloadPage(Page):
         self._analyzed_url = ""
         self._loading = False
         self.options = DownloadOptions.from_dict(ctx.settings.last_options)
+        default_name = ctx.settings.default_preset
+        default = ctx.presets.get(default_name) if default_name else None
+        if default is not None:
+            self.options = default.options.copy()
         if not self.options.output.folder:
             self.options.output.folder = str(ctx.settings.effective_download_dir())
 
         self._build_url_row()
         self.card = MediaCard()
         self.body.addWidget(self.card)
+        self.picker = ItemPicker()
+        self.picker.changed.connect(self._refresh)
+        self.body.addWidget(self.picker)
         self._build_options()
+        self._build_sections()
         self._build_footer()
         self.body.addStretch(1)
 
@@ -88,6 +105,8 @@ class DownloadPage(Page):
         QShortcut(QKeySequence("Ctrl+Enter"), self, self.download)
         paste = QShortcut(QKeySequence.StandardKey.Paste, self, self.paste_and_analyze)
         paste.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        ctx.options_requested.connect(self.set_options)
+        ctx.presets_changed.connect(self._fill_presets)
 
         self._load_options()
         self._refresh()
@@ -125,14 +144,29 @@ class DownloadPage(Page):
 
     def _build_options(self) -> None:
         frame, layout = card()
+        top = QHBoxLayout()
         self.mode = SegmentedControl(
             [
                 (Mode.VIDEO.value, self.tr("Video"), "video"),
                 (Mode.AUDIO.value, self.tr("Audio"), "music"),
+                (Mode.SUBTITLES.value, self.tr("Subtitles"), "captions"),
             ]
         )
         self.mode.changed.connect(self._read_controls)
-        layout.addWidget(self.mode)
+        top.addWidget(self.mode)
+        top.addStretch(1)
+        preset_label = label(self.tr("Preset"), "Muted")
+        self.preset = QComboBox()
+        self.preset.setMinimumWidth(220)
+        preset_label.setBuddy(self.preset)
+        self.save_preset_button = icon_button("star", self.tr("Save as preset"))
+        top.addWidget(preset_label)
+        top.addWidget(self.preset)
+        top.addWidget(self.save_preset_button)
+        layout.addLayout(top)
+        self._fill_presets()
+        self.preset.activated.connect(self._apply_preset)
+        self.save_preset_button.clicked.connect(self.save_preset)
 
         self.mode_stack = QStackedWidget()
         video = QWidget()
@@ -167,6 +201,14 @@ class DownloadPage(Page):
         audio_form.addRow(self.tr("Format"), self.audio_format)
         audio_form.addRow(self.tr("Quality"), self.bitrate)
         self.mode_stack.addWidget(audio)
+
+        self.mode_stack.addWidget(
+            label(
+                self.tr("Only the subtitles are downloaded; choose the languages below."),
+                "Muted",
+                wrap=True,
+            )
+        )
         layout.addWidget(self.mode_stack)
 
         folder_form = QFormLayout()
@@ -175,7 +217,23 @@ class DownloadPage(Page):
         self.folder.changed.connect(self._read_controls)
         folder_form.addRow(self.tr("Save to"), self.folder)
         layout.addLayout(folder_form)
-        self.extra_layout = layout
+        self.body.addWidget(frame)
+
+    def _build_sections(self) -> None:
+        frame, layout = card()
+        self.subtitles = SubtitleSection()
+        self.clip = ClipSection()
+        self.output = OutputSection()
+        self.advanced = AdvancedSection()
+        self.sections = [self.subtitles, self.clip, self.output, self.advanced]
+        self.subtitles_box = Collapsible(self.tr("Subtitles"), self.subtitles)
+        self.clip_box = Collapsible(self.tr("Clip"), self.clip)
+        self.output_box = Collapsible(self.tr("File name and folders"), self.output)
+        self.advanced_box = Collapsible(self.tr("Advanced"), self.advanced)
+        for box in (self.subtitles_box, self.clip_box, self.output_box, self.advanced_box):
+            layout.addWidget(box)
+        for section in self.sections:
+            section.changed.connect(self._read_controls)
         self.body.addWidget(frame)
 
     def _build_footer(self) -> None:
@@ -238,12 +296,14 @@ class DownloadPage(Page):
         self._loading = True
         try:
             o = self.options
-            self.mode.set_value(o.mode.value if o.mode != Mode.SUBTITLES else Mode.VIDEO.value)
+            self.mode.set_value(o.mode.value)
             self._select(self.quality, o.format.quality)
             self._select(self.container, o.format.container)
             self._select(self.audio_format, o.audio.format)
             self._select(self.bitrate, o.audio.bitrate)
             self.folder.set_text(o.output.folder)
+            for section in self.sections:
+                section.load(o)
         finally:
             self._loading = False
 
@@ -257,17 +317,29 @@ class DownloadPage(Page):
         o.audio.format = self.audio_format.currentData() or "mp3"
         o.audio.bitrate = self.bitrate.currentData() or "192"
         o.output.folder = self.folder.text()
+        for section in self.sections:
+            section.read(o)
         self._refresh()
 
     def set_options(self, options: DownloadOptions) -> None:
+        folder = self.options.output.folder
         self.options = options.copy()
+        if not self.options.output.folder:
+            self.options.output.folder = folder
         if not self.options.output.folder:
             self.options.output.folder = str(self.ctx.settings.effective_download_dir())
         self._load_options()
         self._refresh()
 
     def _refresh(self) -> None:
-        self.mode_stack.setCurrentIndex(0 if self.options.mode == Mode.VIDEO else 1)
+        mode = self.options.mode
+        self.mode_stack.setCurrentIndex([Mode.VIDEO, Mode.AUDIO, Mode.SUBTITLES].index(mode))
+        self.subtitles.set_mode(mode)
+        self.advanced.set_mode(mode)
+        if mode == Mode.SUBTITLES:
+            self.subtitles_box.set_expanded(True)
+        self.clip_box.setEnabled(mode != Mode.SUBTITLES)
+        self.output.update_preview(self.options)
         lossless = self.options.audio.format in LOSSLESS_AUDIO_FORMATS | {"best"}
         self.bitrate.setEnabled(not lossless)
         self.command_view.setPlainText(self.command_text())
@@ -309,15 +381,22 @@ class DownloadPage(Page):
         self._analyzed_url = url
         self.probe.analyze(url)
 
+    def _set_info(self, info: MediaInfo | None) -> None:
+        self.info = info
+        self.picker.set_info(info)
+        self.subtitles.set_info(info)
+        self.output.set_info(info)
+        self.output.update_preview(self.options)
+
     def _on_probe_started(self, url: str) -> None:
-        self.info = None
+        self._set_info(None)
         self.card.show_loading(url)
         self.analyze_button.setEnabled(False)
         self.analyze_button.setText(self.tr("Analyzing…"))
 
     def _on_probe_finished(self, url: str, info: MediaInfo) -> None:
         self._end_busy()
-        self.info = info
+        self._set_info(info)
         self.card.show_info(info)
         current = self.options.format.quality
         self._loading = True
@@ -330,7 +409,7 @@ class DownloadPage(Page):
 
     def _on_probe_failed(self, url: str, message: str, details: str) -> None:
         self._end_busy()
-        self.info = None
+        self._set_info(None)
         self.card.show_error(message, details)
 
     def _end_busy(self) -> None:
@@ -351,10 +430,10 @@ class DownloadPage(Page):
         return [url] if url else []
 
     def playlist_items(self) -> str:
-        return ""
+        return self.picker.playlist_items() if self.picker.isVisibleTo(self) else ""
 
     def build_argv(self) -> list[str]:
-        return command_builder.build(
+        return self.ctx.queue.build_argv(
             self.options, self.urls() or ["URL"], playlist_items=self.playlist_items()
         )
 
@@ -376,6 +455,9 @@ class DownloadPage(Page):
             self._show_error(
                 self.tr("This does not look like a web address (http:// or https://).")
             )
+            return False
+        if self.picker.isVisibleTo(self) and not self.picker.has_selection():
+            self._show_error(self.tr("Select at least one item of the list."))
             return False
         duration = self.info.duration if self.info else None
         errors = validate(self.options, duration)
@@ -407,3 +489,51 @@ class DownloadPage(Page):
     def _edit_command(self) -> None:
         self.ctx.command_requested.emit(self.command_text())
         self.ctx.page_requested.emit("command")
+
+    # -- presets ------------------------------------------------------------------------
+
+    def _fill_presets(self) -> None:
+        self.preset.blockSignals(True)
+        self.preset.clear()
+        self.preset.addItem(self.tr("Choose a preset…"), "")
+        for preset in self.ctx.presets.all():
+            self.preset.addItem(messages.preset_name(preset.name), preset.name)
+        self.preset.setCurrentIndex(0)
+        self.preset.blockSignals(False)
+
+    def _apply_preset(self, index: int) -> None:
+        name = self.preset.itemData(index)
+        preset = self.ctx.presets.get(name) if name else None
+        if preset is not None:
+            self.set_options(preset.options)
+            self.ctx.toast_requested.emit(
+                self.tr("Preset applied: {name}").format(name=messages.preset_name(name))
+            )
+        self.preset.setCurrentIndex(0)
+
+    def ask_preset_name(self, suggestion: str) -> str | None:
+        """Ask for a preset name (replaced in tests)."""
+        name, ok = QInputDialog.getText(
+            self, self.tr("Save as preset"), self.tr("Preset name"), text=suggestion
+        )
+        return name if ok else None
+
+    def save_preset(self) -> bool:
+        name = self.ask_preset_name(self.ctx.presets.unique_name(self.tr("My preset")))
+        if not name or not name.strip():
+            return False
+        options = self.options.copy()
+        # Presets do not pin a folder; they use the current destination when applied.
+        options.output.folder = ""
+        existing = self.ctx.presets.get(name.strip())
+        try:
+            if existing is not None and not existing.builtin:
+                self.ctx.presets.save(name, options, overwrite=True)
+            else:
+                self.ctx.presets.save(name, options)
+        except PresetError:
+            self._show_error(self.tr("Choose another name: that one is already used."))
+            return False
+        self.ctx.presets_changed.emit()
+        self.ctx.toast_requested.emit(self.tr("Preset saved"))
+        return True

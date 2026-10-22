@@ -40,6 +40,18 @@ class QueueController(QObject):
         self.job_changed.emit(job)
         self.counts_changed.emit(self.queue.active_count, self.queue.pending_count)
 
+    @staticmethod
+    def build_argv(
+        options: DownloadOptions, urls: Sequence[str], *, playlist_items: str = ""
+    ) -> list[str]:
+        """The argv for a download; "Show command" renders exactly this."""
+        return command_builder.build(
+            options,
+            urls,
+            playlist_items=playlist_items,
+            archive_file=paths.data_dir() / ARCHIVE_FILE_NAME,
+        )
+
     def add_download(
         self,
         options: DownloadOptions,
@@ -49,12 +61,7 @@ class QueueController(QObject):
         playlist_items: str = "",
         thumbnail: str | None = None,
     ) -> Job:
-        argv = command_builder.build(
-            options,
-            urls,
-            playlist_items=playlist_items,
-            archive_file=paths.data_dir() / ARCHIVE_FILE_NAME,
-        )
+        argv = self.build_argv(options, urls, playlist_items=playlist_items)
         folder = options.output.folder or str(paths.default_download_dir())
         return self.queue.add(
             argv,

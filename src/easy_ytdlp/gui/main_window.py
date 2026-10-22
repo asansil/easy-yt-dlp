@@ -17,6 +17,8 @@ from PySide6.QtWidgets import (
 from easy_ytdlp.gui.context import AppContext
 from easy_ytdlp.gui.pages.command_page import CommandPage
 from easy_ytdlp.gui.pages.download_page import DownloadPage
+from easy_ytdlp.gui.pages.history_page import HistoryPage
+from easy_ytdlp.gui.pages.presets_page import PresetsPage
 from easy_ytdlp.gui.pages.queue_page import QueuePage
 from easy_ytdlp.gui.pages.settings_page import SettingsPage
 from easy_ytdlp.gui.theme import RESOURCES, icons
@@ -90,10 +92,14 @@ class MainWindow(QMainWindow):
     def _build_pages(self) -> None:
         self.download_page = DownloadPage(self.ctx)
         self.queue_page = QueuePage(self.ctx)
+        self.history_page = HistoryPage(self.ctx)
+        self.presets_page = PresetsPage(self.ctx)
         self.command_page = CommandPage(self.ctx)
         self.settings_page = SettingsPage(self.ctx)
         self.add_page("download", self.tr("Download"), "download", self.download_page)
         self.add_page("queue", self.tr("Queue"), "list-video", self.queue_page)
+        self.add_page("history", self.tr("History"), "history", self.history_page)
+        self.add_page("presets", self.tr("Presets"), "star", self.presets_page)
         self.add_page("command", self.tr("Command"), "terminal", self.command_page)
         self.add_page("settings", self.tr("Settings"), "settings", self.settings_page, bottom=True)
 

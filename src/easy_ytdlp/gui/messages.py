@@ -33,3 +33,17 @@ def validation(code: ValidationError) -> str:
         ),
     }
     return texts[code]
+
+
+def preset_name(name: str) -> str:
+    """Display name of a preset; built-in presets are translated."""
+    translate = QCoreApplication.translate
+    builtin = {
+        "Best video (MP4)": translate("presets", "Best video (MP4)"),
+        "Video 1080p (MP4)": translate("presets", "Video 1080p (MP4)"),
+        "Video 720p + subtitles": translate("presets", "Video 720p + subtitles"),
+        "Music MP3 320 kbit/s": translate("presets", "Music MP3 320 kbit/s"),
+        "Audio, original format": translate("presets", "Audio, original format"),
+        "Subtitles only": translate("presets", "Subtitles only"),
+    }
+    return builtin.get(name, name)

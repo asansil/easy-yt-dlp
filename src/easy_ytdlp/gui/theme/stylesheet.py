@@ -144,6 +144,7 @@ QPushButton[variant="primary"]:disabled {
     color: $muted_foreground;
 }
 QPushButton[variant="destructive"] { color: $destructive; }
+QPushButton[variant="destructive"]:disabled { color: $muted_foreground; }
 QPushButton[variant="ghost"], QToolButton[variant="ghost"] {
     background: transparent;
     border: 1px solid transparent;
@@ -210,7 +211,8 @@ QListWidget, QTreeWidget, QTableWidget {
     border-radius: ${radius}px;
     outline: none;
 }
-QListWidget::item, QTreeWidget::item { padding: 4px; }
+QListWidget::item { padding: 8px 6px; }
+QTreeWidget::item { padding: 4px; }
 QListWidget::item:selected, QTreeWidget::item:selected, QTableWidget::item:selected {
     background: $selection;
     color: $foreground;
