@@ -346,6 +346,67 @@
     </message>
 </context>
 <context>
+    <name>FirstRunDialog</name>
+    <message>
+        <source>Welcome to Easy yt-dlp</source>
+        <translation>Bienvenido a Easy yt-dlp</translation>
+    </message>
+    <message>
+        <source>To download, Easy yt-dlp needs three free tools: yt-dlp (the downloader), FFmpeg (to merge and convert) and deno (needed by YouTube). They are downloaded from their official sites and checked before use (about 120 MB).</source>
+        <translation>Para descargar, Easy yt-dlp necesita tres herramientas gratuitas: yt-dlp (el descargador), FFmpeg (para unir y convertir) y deno (necesario para YouTube). Se descargan de sus sitios oficiales y se verifican antes de usarlas (unos 120 MB).</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation>Pendiente</translation>
+    </message>
+    <message>
+        <source>Remove the tools of Easy yt-dlp 1.x (%USERPROFILE%\.ytdlp_env) and its PATH entry</source>
+        <translation>Quitar las herramientas de Easy yt-dlp 1.x (%USERPROFILE%\.ytdlp_env) y su entrada del PATH</translation>
+    </message>
+    <message>
+        <source>Skip for now</source>
+        <translation>Ahora no</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>Instalar</translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation>Empezar</translation>
+    </message>
+    <message>
+        <source>Installing…</source>
+        <translation>Instalando…</translation>
+    </message>
+    <message>
+        <source>Downloading…</source>
+        <translation>Descargando…</translation>
+    </message>
+    <message>
+        <source>✓ {version}</source>
+        <translation>✓ {version}</translation>
+    </message>
+    <message>
+        <source>✕ Failed</source>
+        <translation>✕ Error</translation>
+    </message>
+    <message>
+        <source>Could not remove: {items}</source>
+        <translation>No se pudo quitar: {items}</translation>
+    </message>
+    <message>
+        <source>Some tools could not be installed. Check your internet connection and try again.
+{details}</source>
+        <translation>Algunas herramientas no se pudieron instalar. Comprueba tu conexión a internet y vuelve a intentarlo.
+{details}</translation>
+    </message>
+    <message>
+        <source>Try again</source>
+        <translation>Reintentar</translation>
+    </message>
+</context>
+<context>
     <name>FolderPicker</name>
     <message>
         <source>Browse…</source>
@@ -534,6 +595,10 @@
 <context>
     <name>MainWindow</name>
     <message>
+        <source>Update available</source>
+        <translation>Actualización disponible</translation>
+    </message>
+    <message>
         <source>Download</source>
         <translation>Descargar</translation>
     </message>
@@ -560,6 +625,18 @@
     <message>
         <source>{page} (Ctrl+{number})</source>
         <translation>{page} (Ctrl+{number})</translation>
+    </message>
+    <message>
+        <source>Update available: {version}</source>
+        <translation>Actualización disponible: {version}</translation>
+    </message>
+    <message>
+        <source>Updating {tools}…</source>
+        <translation>Actualizando {tools}…</translation>
+    </message>
+    <message>
+        <source>{tool} updated to {version}</source>
+        <translation>{tool} actualizado a {version}</translation>
     </message>
     <message>
         <source>Downloads in progress</source>
@@ -812,6 +889,154 @@
         <source>Downloads at the same time</source>
         <translation>Descargas simultáneas</translation>
     </message>
+    <message>
+        <source>Tools</source>
+        <translation>Herramientas</translation>
+    </message>
+    <message>
+        <source>Tool</source>
+        <translation>Herramienta</translation>
+    </message>
+    <message>
+        <source>Installed</source>
+        <translation>Instalada</translation>
+    </message>
+    <message>
+        <source>Latest</source>
+        <translation>Última</translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Buscar actualizaciones</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Actualizar</translation>
+    </message>
+    <message>
+        <source>Stable</source>
+        <translation>Estable</translation>
+    </message>
+    <message>
+        <source>Nightly (newest fixes)</source>
+        <translation>Nightly (correcciones más recientes)</translation>
+    </message>
+    <message>
+        <source>Update the tools automatically at startup</source>
+        <translation>Actualizar las herramientas automáticamente al iniciar</translation>
+    </message>
+    <message>
+        <source>yt-dlp channel</source>
+        <translation>Canal de yt-dlp</translation>
+    </message>
+    <message>
+        <source>Checking…</source>
+        <translation>Comprobando…</translation>
+    </message>
+    <message>
+        <source>Not installed</source>
+        <translation>No instalada</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: {error}</source>
+        <translation>No se pudo buscar actualizaciones: {error}</translation>
+    </message>
+    <message>
+        <source>Updates available: {tools}</source>
+        <translation>Actualizaciones disponibles: {tools}</translation>
+    </message>
+    <message>
+        <source>Everything is up to date.</source>
+        <translation>Todo está actualizado.</translation>
+    </message>
+    <message>
+        <source>Wait until the downloads finish before updating the tools.</source>
+        <translation>Espera a que terminen las descargas antes de actualizar las herramientas.</translation>
+    </message>
+    <message>
+        <source>Updating {tools}…</source>
+        <translation>Actualizando {tools}…</translation>
+    </message>
+    <message>
+        <source>yt-dlp and FFmpeg can be used from any terminal (they are in your PATH).</source>
+        <translation>yt-dlp y FFmpeg se pueden usar desde cualquier terminal (están en tu PATH).</translation>
+    </message>
+    <message>
+        <source>Remove from PATH</source>
+        <translation>Quitar del PATH</translation>
+    </message>
+    <message>
+        <source>yt-dlp and FFmpeg are not in your PATH; terminals cannot find them.</source>
+        <translation>yt-dlp y FFmpeg no están en tu PATH; los terminales no los encuentran.</translation>
+    </message>
+    <message>
+        <source>Add to PATH</source>
+        <translation>Añadir al PATH</translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>Actualizaciones</translation>
+    </message>
+    <message>
+        <source>Check for new versions of Easy yt-dlp once a day</source>
+        <translation>Buscar versiones nuevas de Easy yt-dlp una vez al día</translation>
+    </message>
+    <message>
+        <source>Include beta versions</source>
+        <translation>Incluir versiones beta</translation>
+    </message>
+    <message>
+        <source>Check now</source>
+        <translation>Comprobar ahora</translation>
+    </message>
+    <message>
+        <source>You have the latest version.</source>
+        <translation>Tienes la última versión.</translation>
+    </message>
+    <message>
+        <source>Version {version} is available.</source>
+        <translation>La versión {version} está disponible.</translation>
+    </message>
+    <message>
+        <source>Data</source>
+        <translation>Datos</translation>
+    </message>
+    <message>
+        <source>Open data folder</source>
+        <translation>Abrir carpeta de datos</translation>
+    </message>
+    <message>
+        <source>Clear history</source>
+        <translation>Borrar historial</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation>Acerca de</translation>
+    </message>
+    <message>
+        <source>Easy yt-dlp {version}</source>
+        <translation>Easy yt-dlp {version}</translation>
+    </message>
+    <message>
+        <source>Project page</source>
+        <translation>Página del proyecto</translation>
+    </message>
+    <message>
+        <source>MIT License</source>
+        <translation>Licencia MIT</translation>
+    </message>
+    <message>
+        <source>Third-party licenses</source>
+        <translation>Licencias de terceros</translation>
+    </message>
+    <message>
+        <source>Remove every entry from the history? Downloaded files are kept.</source>
+        <translation>¿Quitar todas las entradas del historial? Los archivos descargados se conservan.</translation>
+    </message>
+    <message>
+        <source>History cleared</source>
+        <translation>Historial borrado</translation>
+    </message>
 </context>
 <context>
     <name>SubtitleSection</name>
@@ -873,6 +1098,41 @@
     <message>
         <source>The tools could not be installed. Check your internet connection.</source>
         <translation>No se pudieron instalar las herramientas. Comprueba tu conexión a internet.</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateDialog</name>
+    <message>
+        <source>Update available</source>
+        <translation>Actualización disponible</translation>
+    </message>
+    <message>
+        <source>Easy yt-dlp {version} is available</source>
+        <translation>Easy yt-dlp {version} está disponible</translation>
+    </message>
+    <message>
+        <source>You have version {current}.</source>
+        <translation>Tienes la versión {current}.</translation>
+    </message>
+    <message>
+        <source>Skip this version</source>
+        <translation>Omitir esta versión</translation>
+    </message>
+    <message>
+        <source>Later</source>
+        <translation>Más tarde</translation>
+    </message>
+    <message>
+        <source>Install now</source>
+        <translation>Instalar ahora</translation>
+    </message>
+    <message>
+        <source>The app closes, updates itself and opens again. Your settings are kept.</source>
+        <translation>La aplicación se cierra, se actualiza y se vuelve a abrir. Tus ajustes se conservan.</translation>
+    </message>
+    <message>
+        <source>The update could not be downloaded or verified: {error}</source>
+        <translation>No se pudo descargar o verificar la actualización: {error}</translation>
     </message>
 </context>
 <context>

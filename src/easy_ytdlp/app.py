@@ -82,11 +82,29 @@ def run_gui() -> int:
     from easy_ytdlp.gui.main_window import MainWindow
 
     paths.ensure_dirs()
+    from PySide6.QtCore import QTimer
+
+    from easy_ytdlp.gui.dialogs import FirstRunDialog
+    from easy_ytdlp.tools import migration
+
     ctx = AppContext()
     i18n.install(ctx.settings.language)
     ctx.theme.apply()
     window = MainWindow(ctx)
     window.show()
+    settings = ctx.settings
+    legacy = not settings.legacy_prompt_done and migration.legacy_present()
+    if not settings.first_run_done or ctx.tools.missing() or legacy:
+        dialog = FirstRunDialog(
+            ctx.tools, channel=settings.ytdlp_channel, legacy=legacy, parent=window
+        )
+        dialog.exec()
+        settings.first_run_done = True
+        settings.legacy_prompt_done = True
+        ctx.save_settings()
+        window.banner.refresh()
+    # Leave the window responsive first; the checks run in the background anyway.
+    QTimer.singleShot(3000, window.startup_checks)
     return app.exec()
 
 

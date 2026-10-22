@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from easy_ytdlp.gui.context import AppContext
+from easy_ytdlp.gui.dialogs import UpdateDialog
 from easy_ytdlp.gui.pages.command_page import CommandPage
 from easy_ytdlp.gui.pages.download_page import DownloadPage
 from easy_ytdlp.gui.pages.history_page import HistoryPage
@@ -54,6 +55,11 @@ class MainWindow(QMainWindow):
         self.nav_layout.setSpacing(4)
         side.addLayout(self.nav_layout)
         side.addStretch(1)
+        self.update_button = QPushButton(self.tr("Update available"))
+        self.update_button.setObjectName("AccentBadge")
+        self.update_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.update_button.hide()
+        side.addWidget(self.update_button)
         self.bottom_nav = QVBoxLayout()
         side.addLayout(self.bottom_nav)
         root.addWidget(self.sidebar)
@@ -81,6 +87,11 @@ class MainWindow(QMainWindow):
         self.ctx.page_requested.connect(self.show_page)
         self.ctx.queue.counts_changed.connect(self._update_queue_badge)
         self.ctx.tools.finished.connect(lambda _ok: self.banner.refresh())
+        self.ctx.updates.available.connect(self._on_update_available)
+        self.update_button.clicked.connect(self.show_update)
+        self.ctx.tool_updater.started.connect(self._on_tools_updating)
+        self._auto_updating = False
+        self.ctx.tools.tool_installed.connect(self._on_tool_installed)
 
         for number, key in enumerate(self.pages, start=1):
             QShortcut(QKeySequence(f"Ctrl+{number}"), self, lambda key=key: self.show_page(key))
@@ -137,6 +148,34 @@ class MainWindow(QMainWindow):
     def _update_queue_badge(self, active: int, pending: int) -> None:
         title = self.tr("Queue")
         self.nav_buttons["queue"].setText(f"{title} ({pending})" if pending else title)
+
+    # -- updates ------------------------------------------------------------------------
+
+    def startup_checks(self) -> None:
+        """Daily checks for new tool versions and a new app version."""
+        self.ctx.tool_updater.run()
+        self.ctx.updates.check()
+
+    def _on_update_available(self, release) -> None:
+        self.update_button.setText(
+            self.tr("Update available: {version}").format(version=release.tag)
+        )
+        self.update_button.show()
+
+    def show_update(self) -> None:
+        release = self.ctx.updates.release
+        if release is not None:
+            UpdateDialog(self.ctx.updates, release, self).exec()
+
+    def _on_tools_updating(self, names: list) -> None:
+        self._auto_updating = True
+        self.toast.show_message(self.tr("Updating {tools}…").format(tools=", ".join(names)))
+
+    def _on_tool_installed(self, name: str, version: str) -> None:
+        if self._auto_updating:
+            self.toast.show_message(
+                self.tr("{tool} updated to {version}").format(tool=name, version=version)
+            )
 
     # -- state --------------------------------------------------------------------------
 

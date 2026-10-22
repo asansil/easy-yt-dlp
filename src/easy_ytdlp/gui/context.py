@@ -11,6 +11,7 @@ from easy_ytdlp.core.queue import Job
 from easy_ytdlp.core.settings import Settings
 from easy_ytdlp.gui.controllers.queue_controller import QueueController
 from easy_ytdlp.gui.controllers.tools_controller import ToolsController
+from easy_ytdlp.gui.controllers.update_controller import ToolAutoUpdater, UpdateController
 from easy_ytdlp.gui.theme import ThemeManager
 
 log = logging.getLogger(__name__)
@@ -37,6 +38,7 @@ class AppContext(QObject):
         theme: ThemeManager | None = None,
         presets: PresetStore | None = None,
         history: HistoryStore | None = None,
+        updates: UpdateController | None = None,
         persist: bool = True,
         parent: QObject | None = None,
     ) -> None:
@@ -49,6 +51,16 @@ class AppContext(QObject):
         self.presets = presets or PresetStore()
         self.history = history or HistoryStore()
         self.queue.job_finished.connect(self._record)
+        self.updates = updates or UpdateController(
+            self.settings, save=self.save_settings, parent=self
+        )
+        self.tool_updater = ToolAutoUpdater(
+            self.settings,
+            self.tools,
+            is_idle=lambda: self.queue.queue.pending_count == 0,
+            save=self.save_settings,
+            parent=self,
+        )
 
     def _record(self, job: Job) -> None:
         """Store every finished job in the history (runs in the GUI thread)."""
