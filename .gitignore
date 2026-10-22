@@ -12,7 +12,6 @@ env/
 dist/
 build/
 tmp/
-*.spec
 *.egg-info/
 
 .DS_Store
@@ -21,3 +20,4 @@ Thumbs.db
 *.log
 
 .pytest_cache/
+.ruff_cache/
