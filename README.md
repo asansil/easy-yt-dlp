@@ -1,9 +1,19 @@
-# Easy yt-dlp
+<p align="center">
+  <img src="docs/images/icon/app.png" alt="Easy yt-dlp logo" width="96">
+</p>
 
-A Windows desktop app that makes [yt-dlp](https://github.com/yt-dlp/yt-dlp) easy to install, use and keep up to date.
+<h1 align="center">Easy yt-dlp</h1>
 
-> [!NOTE]
-> Easy yt-dlp 2 is in **beta**. Expect rough edges and please report them in [Issues](https://github.com/asansil/easy-yt-dlp/issues). The previous console version stays available as [v1.0.1](https://github.com/asansil/easy-yt-dlp/releases/tag/v1.0.1).
+<p align="center">A Windows desktop app that makes <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a> easy to install, use and keep up to date.</p>
+
+<p align="center">
+  <a href="https://github.com/asansil/easy-yt-dlp/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/asansil/easy-yt-dlp"></a>
+  <a href="https://github.com/asansil/easy-yt-dlp/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/asansil/easy-yt-dlp/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/asansil/easy-yt-dlp"></a>
+  <a href="#requirements"><img alt="Platform: Windows 10 and 11" src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6"></a>
+  <a href="#building-from-source"><img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white"></a>
+  <a href="https://github.com/yt-dlp/yt-dlp"><img alt="Powered by yt-dlp" src="https://img.shields.io/badge/powered%20by-yt--dlp-red"></a>
+</p>
 
 ![Easy yt-dlp download page: a YouTube video analyzed, with its thumbnail, title, uploader and length, Video mode selected, 1080p quality, MP4 format and the destination folder](docs/images/download.png)
 
@@ -37,7 +47,7 @@ It installs and updates yt-dlp, FFmpeg and deno for you, verifies every file it 
 
 ## Installation
 
-1. Download `EasyYtDlp-Setup-<version>.exe` from the [Releases page](https://github.com/asansil/easy-yt-dlp/releases).
+1. Download `EasyYtDlp-Setup-<version>.exe` from the [latest release](https://github.com/asansil/easy-yt-dlp/releases/latest).
 2. Run it. Windows may show **"Windows protected your PC"** because the installer is not code-signed yet: click **More info**, then **Run anyway**.
 3. Keep **"Add yt-dlp and FFmpeg to the PATH"** checked if you also want to use them from a terminal.
 4. On first launch, click **Install** to download yt-dlp, FFmpeg and deno.
@@ -45,7 +55,7 @@ It installs and updates yt-dlp, FFmpeg and deno for you, verifies every file it 
 To check that the installer is the one published, compare its SHA-256 with the `.sha256` file attached to the same release:
 
 ```powershell
-(Get-FileHash .\EasyYtDlp-Setup-2.0.0b1.exe -Algorithm SHA256).Hash
+(Get-FileHash .\EasyYtDlp-Setup-2.0.0.exe -Algorithm SHA256).Hash
 ```
 
 ## Usage
