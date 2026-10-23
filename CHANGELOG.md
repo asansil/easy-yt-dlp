@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Scrolling over a drop-down list no longer changes its value; the page scrolls instead.
+- Larger app and installer icons that fill their space better.
 
 ## [2.0.0b2] - 2026-10-23
 
