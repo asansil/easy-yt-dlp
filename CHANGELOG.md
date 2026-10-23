@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.0.0b2] - 2026-10-23
+
+### Changed
+
+- New icons for the app and the installer.
+
+### Fixed
+
+- Cancelling a download no longer leaves a temporary folder of about 23 MB in `%TEMP%`.
+
 ## [2.0.0b1] - 2026-10-22
 
 First beta of Easy yt-dlp 2: a desktop app that replaces the 1.x console menu.
@@ -33,5 +43,6 @@ First beta of Easy yt-dlp 2: a desktop app that replaces the 1.x console menu.
 
 - The 1.x scripts. Version 1.0.1 remains available from its release page.
 
-[Unreleased]: https://github.com/asansil/easy-yt-dlp/compare/v2.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/asansil/easy-yt-dlp/compare/v2.0.0-beta.2...HEAD
+[2.0.0b2]: https://github.com/asansil/easy-yt-dlp/compare/v2.0.0-beta.1...v2.0.0-beta.2
 [2.0.0b1]: https://github.com/asansil/easy-yt-dlp/releases/tag/v2.0.0-beta.1
