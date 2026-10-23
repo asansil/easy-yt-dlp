@@ -88,7 +88,7 @@ exe = EXE(  # noqa: F821
     exclude_binaries=True,
     name="EasyYtDlp",
     console=False,
-    icon=str(ROOT / "assets" / "yt_dlp_interface.ico"),
+    icon=str(SRC / "resources" / "app.ico"),
     version=version_info,
     upx=False,
 )
