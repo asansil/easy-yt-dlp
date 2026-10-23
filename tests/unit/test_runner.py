@@ -1,10 +1,11 @@
 import sys
 import threading
 import time
+from pathlib import Path
 
 import pytest
 
-from easy_ytdlp.core.runner import ProcessRunner
+from easy_ytdlp.core.runner import ProcessRunner, child_pids
 
 
 def run(code: str) -> tuple[list[str], int | None]:
@@ -48,8 +49,18 @@ def test_on_exit_callback() -> None:
     assert not runner.running
 
 
-def test_cancel_kills_process_tree() -> None:
-    # The parent starts a child that would outlive a plain kill of the parent.
+def start_and_wait_for(runner: ProcessRunner, lines: list[str], marker: str) -> float:
+    started = time.monotonic()
+    runner.start()
+    while marker not in lines and time.monotonic() - started < 20:
+        time.sleep(0.05)
+    return started
+
+
+def test_cancel_kills_process_tree(monkeypatch: pytest.MonkeyPatch) -> None:
+    # The parent starts a child that would outlive a plain kill of the parent, and
+    # never exits by itself, so the kill after the grace time is needed.
+    monkeypatch.setattr(ProcessRunner, "grace_seconds", 1.0)
     code = (
         "import subprocess, sys, time; "
         "subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); "
@@ -57,15 +68,54 @@ def test_cancel_kills_process_tree() -> None:
     )
     lines: list[str] = []
     runner = ProcessRunner([sys.executable, "-c", code], lines.append)
-    started = time.monotonic()
-    runner.start()
-    while "started" not in lines and time.monotonic() - started < 20:
-        time.sleep(0.05)
+    started = start_and_wait_for(runner, lines, "started")
     runner.cancel()
     # wait() returns only when the pipe closes, i.e. when the child is dead too.
     assert runner.wait(20) is not None
     assert runner.cancelled
     assert time.monotonic() - started < 30
+
+
+def test_cancel_lets_parent_clean_up(tmp_path: Path) -> None:
+    # Like the PyInstaller bootloader of yt-dlp.exe: the parent waits for its child,
+    # then cleans up. Cancelling must kill the child only, so the clean-up still runs.
+    marker = tmp_path / "cleaned"
+    code = (
+        "import pathlib, subprocess, sys; "
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); "
+        "print('started', flush=True); child.wait(); "
+        f"pathlib.Path({str(marker)!r}).write_text('ok')"
+    )
+    # The base interpreter: a venv python.exe may be a launcher with its own child.
+    python = getattr(sys, "_base_executable", sys.executable)
+    lines: list[str] = []
+    runner = ProcessRunner([python, "-c", code], lines.append)
+    started = start_and_wait_for(runner, lines, "started")
+    runner.cancel()
+    assert runner.wait(20) is not None
+    assert marker.read_text() == "ok"
+    assert time.monotonic() - started < ProcessRunner.grace_seconds + 20
+
+
+def test_child_pids_lists_direct_children() -> None:
+    code = (
+        "import subprocess, sys, time; "
+        "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)']); "
+        "print(child.pid, flush=True); time.sleep(60)"
+    )
+    python = getattr(sys, "_base_executable", sys.executable)
+    lines: list[str] = []
+    runner = ProcessRunner([python, "-c", code], lines.append)
+    started = time.monotonic()
+    runner.start()
+    while not lines and time.monotonic() - started < 20:
+        time.sleep(0.05)
+    try:
+        assert runner._process is not None
+        assert child_pids(runner._process.pid) == [int(lines[0])]
+    finally:
+        runner.cancel()
+        runner.wait(20)
 
 
 def test_missing_executable_raises() -> None:
