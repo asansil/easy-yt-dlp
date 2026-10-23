@@ -1,0 +1,78 @@
+[youtube:tab] Extracting URL: https://www.youtube.com/playlist?list=PLwclSMR0kf72WS2ZAAAdhpY2lFu4NIcPS
+[youtube:tab] PLwclSMR0kf72WS2ZAAAdhpY2lFu4NIcPS: Downloading webpage
+[youtube:tab] PLwclSMR0kf72WS2ZAAAdhpY2lFu4NIcPS: Redownloading playlist API JSON with unavailable videos
+[download] Downloading playlist: Morning or Night
+[youtube:tab] Playlist Morning or Night: Downloading 2 items of 37
+[download] Downloading item 1 of 2
+[youtube] Extracting URL: https://www.youtube.com/watch?v=LI9upn4t9n8
+[youtube] LI9upn4t9n8: Downloading webpage
+[youtube] LI9upn4t9n8: Downloading tv samsung player API JSON
+[youtube] LI9upn4t9n8: Downloading visionos player API JSON
+[youtube] LI9upn4t9n8: Downloading player dce23b30-main
+[youtube] [jsc:deno] Solving JS challenges using deno
+[youtube] LI9upn4t9n8: Downloading m3u8 information
+[info] LI9upn4t9n8: Downloading 1 format(s): 251
+[info] LI9upn4t9n8: Downloading 1 time ranges: 0.0-3.0
+[download] Sleeping 5.00 seconds as required by the site...
+[download] Destination: 1 - 7 Minute Bedtime Yoga - Yoga With Adriene.webm
+Input #0, matroska,webm, from 'https://example.invalid/videoplayback':
+  Metadata:
+    encoder         : google/video-file
+  Duration: 00:06:58.94, start: 0.000000, bitrate: 100 kb/s
+  Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp (default)
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+Output #0, webm, to 'file:1 - 7 Minute Bedtime Yoga - Yoga With Adriene.webm.part':
+  Metadata:
+    encoder         : Lavf63.1.102
+  Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp (default)
+Press [q] to stop, [?] for help
+[out#0/webm @ 0000022654f0d7c0] video:0KiB audio:49KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 3.070576%
+size=      51KiB time=00:00:03.01 bitrate= 137.9kbits/s speed= 309x elapsed=0:00:00.00    
+[easyytdlp:download] {"status": "finished", "downloaded_bytes": 51962, "total_bytes": 51962, "speed": 261535.29700585725} {"id": "LI9upn4t9n8", "title": "7 Minute Bedtime Yoga - Yoga With Adriene", "playlist_index": 1, "n_entries": 2}
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "ExtractAudio"} {"id": "LI9upn4t9n8", "title": "7 Minute Bedtime Yoga - Yoga With Adriene", "playlist_index": 1, "n_entries": 2}
+[ExtractAudio] Destination: 1 - 7 Minute Bedtime Yoga - Yoga With Adriene.mp3
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "ExtractAudio"} {"id": "LI9upn4t9n8", "title": "7 Minute Bedtime Yoga - Yoga With Adriene", "playlist_index": 1, "n_entries": 2}
+Deleting original file 1 - 7 Minute Bedtime Yoga - Yoga With Adriene.webm (pass -k to keep)
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "MoveFiles"} {"id": "LI9upn4t9n8", "title": "7 Minute Bedtime Yoga - Yoga With Adriene", "playlist_index": 1, "n_entries": 2}
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "MoveFiles"} {"id": "LI9upn4t9n8", "title": "7 Minute Bedtime Yoga - Yoga With Adriene", "playlist_index": 1, "n_entries": 2}
+[easyytdlp:file] "C:\\Users\\user\\Downloads\\1 - 7 Minute Bedtime Yoga - Yoga With Adriene.mp3"
+[download] Downloading item 2 of 2
+[youtube] Extracting URL: https://www.youtube.com/watch?v=_LBBKXRgpBg
+[youtube] _LBBKXRgpBg: Downloading webpage
+[youtube] _LBBKXRgpBg: Downloading tv samsung player API JSON
+[youtube] _LBBKXRgpBg: Downloading visionos player API JSON
+[youtube] [jsc:deno] Solving JS challenges using deno
+[youtube] _LBBKXRgpBg: Downloading m3u8 information
+[info] _LBBKXRgpBg: Downloading 1 format(s): 251
+[info] _LBBKXRgpBg: Downloading 1 time ranges: 0.0-3.0
+[download] Sleeping 5.00 seconds as required by the site...
+[download] Destination: 2 - Revolution - Day 8 - Practice Serenity.webm
+Input #0, matroska,webm, from 'https://example.invalid/videoplayback':
+  Metadata:
+    encoder         : google/video-file
+  Duration: 00:31:02.56, start: 0.000000, bitrate: 101 kb/s
+  Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp (default)
+Stream mapping:
+  Stream #0:0 -> #0:0 (copy)
+Output #0, webm, to 'file:2 - Revolution - Day 8 - Practice Serenity.webm.part':
+  Metadata:
+    encoder         : Lavf63.1.102
+  Stream #0:0(eng): Audio: opus, 48000 Hz, stereo, fltp (default)
+Press [q] to stop, [?] for help
+size=       0KiB time=00:00:01.89 bitrate=   1.9kbits/s speed=3.64x elapsed=0:00:00.52    
+size=       0KiB time=00:00:01.89 bitrate=   1.9kbits/s speed=1.83x elapsed=0:00:01.03    
+size=       0KiB time=00:00:02.85 bitrate=   1.3kbits/s speed=1.84x elapsed=0:00:01.54    
+[out#0/webm @ 000002a36aabee80] video:0KiB audio:46KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 3.255990%
+size=      48KiB time=00:00:03.01 bitrate= 130.0kbits/s speed=1.75x elapsed=0:00:01.72    
+[easyytdlp:download] {"status": "finished", "downloaded_bytes": 48996, "total_bytes": 48996, "speed": 20478.997518254342} {"id": "_LBBKXRgpBg", "title": "Revolution - Day 8 - Practice Serenity", "playlist_index": 2, "n_entries": 2}
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "ExtractAudio"} {"id": "_LBBKXRgpBg", "title": "Revolution - Day 8 - Practice Serenity", "playlist_index": 2, "n_entries": 2}
+[ExtractAudio] Destination: 2 - Revolution - Day 8 - Practice Serenity.mp3
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "ExtractAudio"} {"id": "_LBBKXRgpBg", "title": "Revolution - Day 8 - Practice Serenity", "playlist_index": 2, "n_entries": 2}
+Deleting original file 2 - Revolution - Day 8 - Practice Serenity.webm (pass -k to keep)
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "MoveFiles"} {"id": "_LBBKXRgpBg", "title": "Revolution - Day 8 - Practice Serenity", "playlist_index": 2, "n_entries": 2}
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "MoveFiles"} {"id": "_LBBKXRgpBg", "title": "Revolution - Day 8 - Practice Serenity", "playlist_index": 2, "n_entries": 2}
+[easyytdlp:file] "C:\\Users\\user\\Downloads\\2 - Revolution - Day 8 - Practice Serenity.mp3"
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "Concat"} {"id": "PLwclSMR0kf72WS2ZAAAdhpY2lFu4NIcPS", "title": "Morning or Night"}
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "Concat"} {"id": "PLwclSMR0kf72WS2ZAAAdhpY2lFu4NIcPS", "title": "Morning or Night"}
+[download] Finished downloading playlist: Morning or Night

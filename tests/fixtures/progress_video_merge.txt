@@ -1,0 +1,36 @@
+[youtube] Extracting URL: https://www.youtube.com/watch?v=jNQXAC9IVRw
+[youtube] jNQXAC9IVRw: Downloading webpage
+[youtube] jNQXAC9IVRw: Downloading tv samsung player API JSON
+[youtube] jNQXAC9IVRw: Downloading visionos player API JSON
+[youtube] jNQXAC9IVRw: Downloading player cbcfbf2f-main
+[youtube] [jsc:deno] Solving JS challenges using deno
+[youtube] jNQXAC9IVRw: Downloading m3u8 information
+[info] jNQXAC9IVRw: Downloading 1 format(s): 395+251
+[download] Destination: Me at the zoo [jNQXAC9IVRw].f395.mp4
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 1024, "total_bytes": 223779} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 3072, "total_bytes": 223779, "speed": 3059819.9686535266, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 7168, "total_bytes": 223779, "speed": 3577010.2405710886, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 15360, "total_bytes": 223779, "speed": 7665021.944080904, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 31744, "total_bytes": 223779, "speed": 6345628.928414832, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 64512, "total_bytes": 223779, "speed": 6449207.25636381, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 130048, "total_bytes": 223779, "speed": 8014764.779405498, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 223779, "total_bytes": 223779, "speed": 10795670.15730027, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "finished", "downloaded_bytes": 223779, "total_bytes": 223779, "speed": 3644726.1003564745} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[download] Destination: Me at the zoo [jNQXAC9IVRw].f251.webm
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 1024, "total_bytes": 252182} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 3072, "total_bytes": 252182} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 7168, "total_bytes": 252182} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 15360, "total_bytes": 252182} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 31744, "total_bytes": 252182, "speed": 15846701.520590335, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 64512, "total_bytes": 252182, "speed": 32204586.961199716, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 130048, "total_bytes": 252182, "speed": 43297415.98602953, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "downloading", "downloaded_bytes": 252182, "total_bytes": 252182, "speed": 36026157.06158038, "eta": 0} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:download] {"status": "finished", "downloaded_bytes": 252182, "total_bytes": 252182, "speed": 8242635.604625791} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "Merger"} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[Merger] Merging formats into "Me at the zoo [jNQXAC9IVRw].mkv"
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "Merger"} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+Deleting original file Me at the zoo [jNQXAC9IVRw].f251.webm (pass -k to keep)
+Deleting original file Me at the zoo [jNQXAC9IVRw].f395.mp4 (pass -k to keep)
+[easyytdlp:postprocess] {"status": "started", "postprocessor": "MoveFiles"} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:postprocess] {"status": "finished", "postprocessor": "MoveFiles"} {"id": "jNQXAC9IVRw", "title": "Me at the zoo"}
+[easyytdlp:file] "C:\\Users\\user\\Downloads\\Me at the zoo [jNQXAC9IVRw].mkv"

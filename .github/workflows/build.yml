@@ -1,0 +1,76 @@
+name: Build
+
+on:
+  push:
+    branches: [v2]
+  pull_request:
+    branches: [main, v2]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  # The job ids "build" and "install-smoke" are required status checks; do not rename them.
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Install Inno Setup if missing
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+
+      - name: Build app and installer
+        shell: pwsh
+        run: ./packaging/build.ps1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: setup
+          path: |
+            dist/EasyYtDlp-Setup-*.exe
+            dist/EasyYtDlp-Setup-*.exe.sha256
+          if-no-files-found: error
+
+  install-smoke:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tests/packaging
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: setup
+          path: setup
+
+      - name: Install, self-test and uninstall (with PATH)
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem setup\EasyYtDlp-Setup-*.exe | Select-Object -First 1
+          ./tests/packaging/install_smoke.ps1 -Setup $setup.FullName -LogDir "$env:RUNNER_TEMP\smoke-path"
+
+      - name: Install, self-test and uninstall (without PATH)
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem setup\EasyYtDlp-Setup-*.exe | Select-Object -First 1
+          ./tests/packaging/install_smoke.ps1 -Setup $setup.FullName -NoPath -LogDir "$env:RUNNER_TEMP\smoke-nopath"
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: smoke-logs
+          path: ${{ runner.temp }}/smoke-*
