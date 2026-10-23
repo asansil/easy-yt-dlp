@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Scrolling over a drop-down list no longer changes its value; the page scrolls instead.
+
 ## [2.0.0b2] - 2026-10-23
 
 ### Changed

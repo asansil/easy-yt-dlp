@@ -65,13 +65,14 @@ def create_application():
     """The QApplication with the app identity and the bundled fonts."""
     from PySide6.QtWidgets import QApplication
 
-    from easy_ytdlp.gui import theme
+    from easy_ytdlp.gui import theme, wheel_guard
 
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setOrganizationName(ORG_NAME)
     app.setApplicationVersion(__version__)
     theme.load_fonts()
+    wheel_guard.install(app)
     return app
 
 
