@@ -6,9 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-11-21
+
+Easier clip times, and a copied command that pastes into PowerShell and cmd.
+
 ### Changed
 
-- Clip times are typed into `HH:MM:SS` fields with the ":" already in place. The cursor moves on from hours to minutes to seconds as you type, and a first digit of 6–9 in the minutes or seconds counts as `06`–`09`. Up and Down change the part under the cursor, and pasted times such as `1:30` are converted. "To the end" replaces an empty end time. For an analyzed video, the times are limited to its length and the clip length is shown.
+- Clip times are typed into `HH:MM:SS` fields with the ":" already in place. The cursor moves on from hours to minutes to seconds as you type, and a first digit from 6 to 9 in the minutes or seconds counts as `06` to `09`. Up and Down change the part under the cursor, and pasted times such as `1:30` are converted. "To the end" replaces an empty end time. For an analyzed video, the times are limited to its length and the clip length is shown.
 - Clip sections are passed to yt-dlp as `HH:MM:SS` (for example `--download-sections "*00:01:30-00:02:45"`), easier to read in the command.
 - A clip from 00:00:00 to the end adds no `--download-sections` (nor `--force-keyframes-at-cuts`): the whole media is downloaded without cutting it.
 
@@ -44,5 +48,6 @@ Easy yt-dlp 2: a desktop app that replaces the 1.x console menu.
 
 - The 1.x scripts. Version 1.0.1 remains available from its release page.
 
-[Unreleased]: https://github.com/asansil/easy-yt-dlp/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/asansil/easy-yt-dlp/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/asansil/easy-yt-dlp/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/asansil/easy-yt-dlp/compare/v1.0.1...v2.0.0
