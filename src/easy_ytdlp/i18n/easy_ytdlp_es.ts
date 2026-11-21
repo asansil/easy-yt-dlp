@@ -8,7 +8,7 @@
         <translation>No usar cookies</translation>
     </message>
     <message>
-        <source>Use your browser's login for private or age-restricted videos. yt-dlp reads the cookies at download time; Easy yt-dlp never stores them.</source>
+        <source>Use your browser&apos;s login for private or age-restricted videos. yt-dlp reads the cookies at download time; Easy yt-dlp never stores them.</source>
         <translation>Usa la sesión de tu navegador para vídeos privados o con restricción de edad. yt-dlp lee las cookies al descargar; Easy yt-dlp nunca las guarda.</translation>
     </message>
     <message>
@@ -103,8 +103,28 @@
         <translation>Descargar solo una parte (clip)</translation>
     </message>
     <message>
-        <source>end</source>
-        <translation>final</translation>
+        <source>Clip start</source>
+        <translation>Inicio del clip</translation>
+    </message>
+    <message>
+        <source>Clip end</source>
+        <translation>Final del clip</translation>
+    </message>
+    <message>
+        <source>To the end</source>
+        <translation>Hasta el final</translation>
+    </message>
+    <message>
+        <source>The end must be after the start.</source>
+        <translation>El final debe ser posterior al inicio.</translation>
+    </message>
+    <message>
+        <source>Clip length: {time} (to the end)</source>
+        <translation>Duración del clip: {time} (hasta el final)</translation>
+    </message>
+    <message>
+        <source>Clip length: {time}</source>
+        <translation>Duración del clip: {time}</translation>
     </message>
     <message>
         <source>From</source>
@@ -117,10 +137,6 @@
     <message>
         <source>Precise cuts (slower, re-encodes)</source>
         <translation>Cortes precisos (más lento, recodifica)</translation>
-    </message>
-    <message>
-        <source>Times as h:mm:ss, m:ss or seconds.</source>
-        <translation>Tiempos como h:mm:ss, m:ss o segundos.</translation>
     </message>
 </context>
 <context>

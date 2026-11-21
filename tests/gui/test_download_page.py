@@ -32,7 +32,7 @@ def test_controls_update_options_and_command(qtbot, ctx) -> None:
     assert page.options.audio.format == "opus"
     text = page.command_view.toPlainText()
     assert text.startswith("yt-dlp -f ba/b -x --audio-format opus --audio-quality 128K")
-    assert text.endswith(f"-- {URL}")
+    assert text.endswith(f'-- "{URL}"')
     assert page.mode_stack.currentIndex() == 1
 
     page.audio_format.setCurrentIndex(page.audio_format.findData("flac"))

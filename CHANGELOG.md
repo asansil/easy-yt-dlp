@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Clip times are typed into `HH:MM:SS` fields with the ":" already in place. The cursor moves on from hours to minutes to seconds as you type, and a first digit of 6–9 in the minutes or seconds counts as `06`–`09`. Up and Down change the part under the cursor, and pasted times such as `1:30` are converted. "To the end" replaces an empty end time. For an analyzed video, the times are limited to its length and the clip length is shown.
+- Clip sections are passed to yt-dlp as `HH:MM:SS` (for example `--download-sections "*00:01:30-00:02:45"`), easier to read in the command.
+
+### Fixed
+
+- The copied command now works when pasted into PowerShell or cmd. Arguments such as `%(ext)s`, `res,ext:mp4:m4a`, `<=` or `|` are now quoted.
+
 ## [2.0.0] - 2026-10-23
 
 Easy yt-dlp 2: a desktop app that replaces the 1.x console menu.

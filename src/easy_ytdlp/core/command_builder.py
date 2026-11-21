@@ -4,8 +4,9 @@ The GUI, "Show command" and command mode all go through this module, so what the
 sees is always what runs.
 """
 
+import math
+import re
 import shlex
-import subprocess
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -16,6 +17,7 @@ from easy_ytdlp.core.options import (
     Mode,
     Organize,
     SponsorBlock,
+    format_hms,
     parse_time,
 )
 
@@ -109,15 +111,12 @@ def _clip_args(options: DownloadOptions) -> list[str]:
     end = parse_time(clip.end) if clip.end.strip() else None
     if start is None or (clip.end.strip() and end is None):
         return []
-    section = f"*{_seconds(start)}-{_seconds(end) if end is not None else 'inf'}"
-    args = ["--download-sections", section]
+    # Whole seconds; older presets may hold fractions, so round outwards to keep them.
+    end_text = format_hms(math.ceil(end)) if end is not None else "inf"
+    args = ["--download-sections", f"*{format_hms(math.floor(start))}-{end_text}"]
     if clip.force_keyframes:
         args.append("--force-keyframes-at-cuts")
     return args
-
-
-def _seconds(value: float) -> str:
-    return str(int(value)) if value == int(value) else f"{value:g}"
 
 
 def _advanced_args(options: DownloadOptions, archive_file: Path | None) -> list[str]:
@@ -200,10 +199,32 @@ def mask_secrets(args: Sequence[str]) -> list[str]:
     return masked
 
 
+# Characters that neither PowerShell nor cmd treat specially in a bare argument.
+_BARE_ARG = re.compile(r"[A-Za-z0-9_\-+./:\\=]+")
+
+
+def shell_quote(arg: str) -> str:
+    """Quote one argument so it pastes the same into PowerShell and cmd.
+
+    Bare text is limited to characters both shells leave alone; anything else, such as
+    ``%(ext)s`` (a PowerShell subexpression), ``,`` (an array), ``|``, ``<`` or ``&``, is
+    wrapped in double quotes. Limit: PowerShell still expands ``$`` and backticks inside
+    double quotes; the arguments the app generates never contain them.
+    """
+    if _BARE_ARG.fullmatch(arg) and not arg.startswith("@"):
+        return arg
+    # Windows argument parsing: an inner quote becomes \" and the backslashes before it,
+    # or before the closing quote, are doubled. cmd passes this through as is; PowerShell
+    # only copes with inner quotes from 7.3 on.
+    escaped = re.sub(r'(\\*)"', r'\1\1\\"', arg)
+    escaped = re.sub(r"(\\+)$", r"\1\1", escaped)
+    return f'"{escaped}"'
+
+
 def to_display(argv: Sequence[str], *, include_machine_flags: bool = False) -> str:
     """Render an argv as a copyable command line with secrets masked."""
     args = list(argv[1:]) if include_machine_flags else user_args(argv)
-    return subprocess.list2cmdline([DISPLAY_EXE, *mask_secrets(args)])
+    return " ".join(shell_quote(arg) for arg in [DISPLAY_EXE, *mask_secrets(args)])
 
 
 def split_arguments(text: str) -> list[str]:

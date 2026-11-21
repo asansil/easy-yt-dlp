@@ -39,7 +39,7 @@ def test_playlist_selection(qtbot, ctx, fake_ytdlp, fixture_json) -> None:
     picker.ranges.setText("1-2, 5")
     picker.apply_ranges.click()
     assert page.playlist_items() == "1-2,5"
-    assert "-I 1-2,5" in page.command_view.toPlainText()
+    assert '-I "1-2,5"' in page.command_view.toPlainText()
 
     picker.ranges.setText("x")
     picker.apply_ranges.click()
@@ -69,15 +69,17 @@ def test_subtitles_mode_and_sections(qtbot, ctx, fake_ytdlp, fixture_json) -> No
     page.subtitles.auto.setChecked(True)
     text = page.command_view.toPlainText()
     assert "--skip-download" in text
-    assert "--write-auto-subs --sub-langs es,en" in text
+    assert '--write-auto-subs --sub-langs "es,en"' in text
     assert not page.clip_box.isEnabled()
 
 
 def test_clip_output_and_advanced(qtbot, ctx, fake_ytdlp, fixture_json) -> None:
     page = analyzed(qtbot, ctx, fixture_json, "probe_video.json", VIDEO)
     page.clip.enabled.setChecked(True)
-    page.clip.start.setText("0:05")
-    page.clip.end.setText("0:10")
+    page.clip.start.setValue(5)
+    page.clip.to_end.setChecked(False)
+    assert page.clip.end.value() == 19  # filled in with the duration
+    page.clip.end.setValue(10)
     page.clip.keyframes.setChecked(True)
     page.output.organize.setCurrentIndex(page.output.organize.findData("uploader"))
     page.output.template.setText("%(title)s.%(ext)s")
@@ -90,10 +92,10 @@ def test_clip_output_and_advanced(qtbot, ctx, fake_ytdlp, fixture_json) -> None:
     adv.extra.setText("--no-mtime")
     text = page.command_view.toPlainText()
     for part in (
-        "--download-sections *5-10 --force-keyframes-at-cuts",
-        "-o %(uploader,channel|Unknown)s/%(title)s.%(ext)s",
+        '--download-sections "*00:00:05-00:00:10" --force-keyframes-at-cuts',
+        '-o "%(uploader,channel|Unknown)s/%(title)s.%(ext)s"',
         "--cookies-from-browser firefox",
-        "--sponsorblock-remove sponsor,intro",
+        '--sponsorblock-remove "sponsor,intro"',
         "-r 2M",
         "--download-archive",
         "--no-mtime --",
@@ -101,7 +103,8 @@ def test_clip_output_and_advanced(qtbot, ctx, fake_ytdlp, fixture_json) -> None:
         assert part in text, part
     assert page.output.preview.text().endswith("jawed\\Me at the zoo.mp4")
 
-    page.clip.end.setText("0:01")
+    page.clip.end.setValue(1)
+    assert "end must be after the start" in page.clip.length.text()
     assert not page.enqueue(navigate=False)
     assert "after its start" in page.error.text()
 
@@ -115,7 +118,7 @@ def test_options_round_trip_through_controls(qtbot, ctx) -> None:
     options.subtitles.enabled = True
     options.subtitles.languages = ["fr"]
     options.clip.enabled = True
-    options.clip.end = "30"
+    options.clip.end = "00:00:30"
     options.advanced.embed_thumbnail = True
     options.output.folder = "D:\\Music"
     page = page_with(qtbot, ctx)

@@ -383,6 +383,7 @@ class DownloadPage(Page):
         self.info = info
         self.picker.set_info(info)
         self.subtitles.set_info(info)
+        self.clip.set_info(info)
         self.output.set_info(info)
         self.output.update_preview(self.options)
 
