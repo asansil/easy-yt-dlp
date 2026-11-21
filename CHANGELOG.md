@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Fixed
 
 - The copied command now works when pasted into PowerShell or cmd. Arguments such as `%(ext)s`, `res,ext:mp4:m4a`, `<=` or `|` are now quoted.
+- "Show command" no longer shrinks to a single line when the window is not maximized: it grows with the command (up to 10 lines) and the page scrolls instead.
 
 ## [2.0.0] - 2026-10-23
 

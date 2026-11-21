@@ -10,7 +10,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QInputDialog,
     QLineEdit,
-    QPlainTextEdit,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
@@ -35,6 +34,7 @@ from easy_ytdlp.gui.controllers.probe_controller import ProbeController
 from easy_ytdlp.gui.pages.base import Page
 from easy_ytdlp.gui.widgets.common import (
     Collapsible,
+    FitTextView,
     FolderPicker,
     SegmentedControl,
     button,
@@ -253,10 +253,8 @@ class DownloadPage(Page):
         panel = QWidget()
         panel_layout = QVBoxLayout(panel)
         panel_layout.setContentsMargins(0, 0, 0, 0)
-        self.command_view = QPlainTextEdit()
+        self.command_view = FitTextView()
         self.command_view.setObjectName("CommandView")
-        self.command_view.setReadOnly(True)
-        self.command_view.setMaximumHeight(110)
         self.command_view.setAccessibleName(self.tr("yt-dlp command"))
         actions = QHBoxLayout()
         self.copy_button = button(self.tr("Copy"), "copy")

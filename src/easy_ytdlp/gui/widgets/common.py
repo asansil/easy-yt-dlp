@@ -1,8 +1,9 @@
 """Small building blocks shared by the pages."""
 
+import math
 from collections.abc import Sequence
 
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, Qt, QTimer, Signal
+from PySide6.QtCore import QEasingCurve, QEvent, QPropertyAnimation, Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QButtonGroup,
     QFileDialog,
@@ -11,6 +12,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QPlainTextEdit,
     QPushButton,
     QSizePolicy,
     QToolButton,
@@ -155,6 +157,57 @@ class FolderPicker(QWidget):
         folder = QFileDialog.getExistingDirectory(self, self.tr("Choose a folder"), self.text())
         if folder:
             self.edit.setText(folder.replace("/", "\\"))
+
+
+class FitTextView(QPlainTextEdit):
+    """Read-only text whose height follows its wrapped lines, between two limits.
+
+    On a scrolling page a plain text edit is the first widget squeezed when the window is
+    short, down to about one line. A fixed height that fits the content makes the page
+    scroll instead; past ``max_lines`` the view scrolls itself.
+    """
+
+    def __init__(
+        self, min_lines: int = 2, max_lines: int = 10, parent: QWidget | None = None
+    ) -> None:
+        super().__init__(parent)
+        self._min_lines = min_lines
+        self._max_lines = max_lines
+        self.setReadOnly(True)
+        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        # The plain-text layout measures the document in lines, wrapped ones included.
+        self.document().documentLayout().documentSizeChanged.connect(self._fit)
+        self._fit()
+
+    def _fit(self, *_args: object) -> None:
+        lines = int(self.document().documentLayout().documentSize().height())
+        lines = min(max(lines, self._min_lines), self._max_lines)
+        # Frame and stylesheet padding: whatever is not viewport. Only meaningful once
+        # the widget is laid out, hence the refits on show and resize.
+        chrome = self.height() - self.viewport().height()
+        margin = math.ceil(2 * self.document().documentMargin())
+        # A couple of spare pixels keep the last line from needing the scroll bar.
+        height = lines * self.fontMetrics().lineSpacing() + margin + chrome + 4
+        if height != self.height():
+            self.setFixedHeight(height)
+
+    def _fit_later(self) -> None:
+        QTimer.singleShot(0, self._fit)
+
+    def showEvent(self, event: QEvent) -> None:
+        super().showEvent(event)
+        self._fit_later()
+
+    def resizeEvent(self, event: QEvent) -> None:
+        super().resizeEvent(event)
+        # A new width re-wraps the text; the line count is final after this event.
+        self._fit_later()
+
+    def changeEvent(self, event: QEvent) -> None:
+        super().changeEvent(event)
+        # The stylesheet font and padding arrive after construction.
+        if event.type() in (QEvent.Type.StyleChange, QEvent.Type.FontChange):
+            self._fit_later()
 
 
 class Collapsible(QWidget):
