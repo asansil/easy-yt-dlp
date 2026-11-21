@@ -111,6 +111,8 @@ def _clip_args(options: DownloadOptions) -> list[str]:
     end = parse_time(clip.end) if clip.end.strip() else None
     if start is None or (clip.end.strip() and end is None):
         return []
+    if math.floor(start) == 0 and end is None:
+        return []  # from the beginning to the end: the whole media, nothing to cut
     # Whole seconds; older presets may hold fractions, so round outwards to keep them.
     end_text = format_hms(math.ceil(end)) if end is not None else "inf"
     args = ["--download-sections", f"*{format_hms(math.floor(start))}-{end_text}"]

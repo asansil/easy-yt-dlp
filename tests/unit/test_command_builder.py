@@ -141,6 +141,18 @@ def test_clip(start: str, end: str, section: str) -> None:
     assert has_seq(args_of(options), "--download-sections", section, "--force-keyframes-at-cuts")
 
 
+@pytest.mark.parametrize(("start", "end"), [("", ""), ("0", ""), ("00:00:00", ""), ("0.4", "")])
+def test_whole_media_clip_adds_no_section(start: str, end: str) -> None:
+    options = DownloadOptions()
+    options.clip.enabled = True
+    options.clip.start = start
+    options.clip.end = end
+    options.clip.force_keyframes = True
+    args = args_of(options)
+    assert "--download-sections" not in args
+    assert "--force-keyframes-at-cuts" not in args
+
+
 def test_invalid_clip_is_ignored() -> None:
     options = DownloadOptions()
     options.clip.enabled = True
