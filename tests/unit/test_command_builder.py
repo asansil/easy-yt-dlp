@@ -1,3 +1,7 @@
+import json
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -119,7 +123,14 @@ def test_audio_subtitles_are_separate_files() -> None:
 
 @pytest.mark.parametrize(
     ("start", "end", "section"),
-    [("1:00", "2:30.5", "*60-150.5"), ("", "10", "*0-10"), ("0:05", "", "*5-inf")],
+    [
+        ("1:00", "2:30", "*00:01:00-00:02:30"),
+        ("", "10", "*00:00:00-00:00:10"),
+        ("0:05", "", "*00:00:05-inf"),
+        ("1:02:03", "100:00:00", "*01:02:03-100:00:00"),
+        # Fractions from 2.0.0 presets round outwards so the clip keeps the whole range.
+        ("4.7", "2:30.2", "*00:00:04-00:02:31"),
+    ],
 )
 def test_clip(start: str, end: str, section: str) -> None:
     options = DownloadOptions()
@@ -128,6 +139,18 @@ def test_clip(start: str, end: str, section: str) -> None:
     options.clip.end = end
     options.clip.force_keyframes = True
     assert has_seq(args_of(options), "--download-sections", section, "--force-keyframes-at-cuts")
+
+
+@pytest.mark.parametrize(("start", "end"), [("", ""), ("0", ""), ("00:00:00", ""), ("0.4", "")])
+def test_whole_media_clip_adds_no_section(start: str, end: str) -> None:
+    options = DownloadOptions()
+    options.clip.enabled = True
+    options.clip.start = start
+    options.clip.end = end
+    options.clip.force_keyframes = True
+    args = args_of(options)
+    assert "--download-sections" not in args
+    assert "--force-keyframes-at-cuts" not in args
 
 
 def test_invalid_clip_is_ignored() -> None:
@@ -196,12 +219,70 @@ def test_default_folder_is_downloads() -> None:
 
 def test_to_display_hides_machine_flags_and_quotes() -> None:
     text = cb.to_display(build(DownloadOptions()))
-    assert text.startswith("yt-dlp -f bv*+ba/b -S res,ext:mp4:m4a")
+    assert text.startswith('yt-dlp -f "bv*+ba/b" -S "res,ext:mp4:m4a"')
     assert '"%(title)s [%(id)s].%(ext)s"' in text
     assert "--progress-template" not in text
     assert "--progress-template" in cb.to_display(
         build(DownloadOptions()), include_machine_flags=True
     )
+
+
+@pytest.mark.parametrize(
+    ("arg", "shown"),
+    [
+        ("--download-sections", "--download-sections"),
+        (r"D:\Videos", r"D:\Videos"),
+        ("https://example.com/v/1", "https://example.com/v/1"),
+        ("refe_intro.%(ext)s", '"refe_intro.%(ext)s"'),
+        ("res,ext:mp4:m4a", '"res,ext:mp4:m4a"'),
+        ("bv*[height<=720]+ba/b", '"bv*[height<=720]+ba/b"'),
+        ("%(uploader,channel|Unknown)s/", '"%(uploader,channel|Unknown)s/"'),
+        ("https://x.com/watch?v=a&t=5", '"https://x.com/watch?v=a&t=5"'),
+        (r"C:\My Videos", r'"C:\My Videos"'),
+        ("@file", '"@file"'),
+        ("", '""'),
+        ('say "hi"', r'"say \"hi\""'),
+        ("C:\\My Videos\\", '"C:\\My Videos\\\\"'),
+    ],
+)
+def test_shell_quote(arg: str, shown: str) -> None:
+    assert cb.shell_quote(arg) == shown
+
+
+def _tricky_argv() -> list[str]:
+    options = DownloadOptions()
+    options.format.quality = "1080"
+    options.output.template = "refe_intro.%(ext)s"
+    options.output.organize = Organize.UPLOADER_PLAYLIST
+    options.output.folder = r"C:\Users\me\My Videos"
+    options.clip.enabled = True
+    options.clip.start = "0:05"
+    options.advanced.extra_args = '--exec "echo {}"'
+    return cb.build(options, ["https://www.youtube.com/watch?v=abc&t=5"], ytdlp=YTDLP)
+
+
+def test_displayed_command_splits_back() -> None:
+    argv = _tricky_argv()
+    assert cb.split_arguments(cb.to_display(argv))[1:] == cb.user_args(argv)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows shells")
+@pytest.mark.parametrize("shell", ["powershell", "pwsh", "cmd"])
+def test_displayed_command_pastes_into_windows_shells(shell: str, tmp_path: Path) -> None:
+    """Paste the displayed command into each shell, with an argv-echo stub as yt-dlp."""
+    if not shutil.which(shell):
+        pytest.skip(f"{shell} is not installed")
+    argv = _tricky_argv()
+    stub = tmp_path / "echo_args.py"
+    stub.write_text("import json, sys\nprint(json.dumps(sys.argv[1:]))\n", encoding="utf-8")
+    program = f"{cb.shell_quote(sys.executable)} {cb.shell_quote(str(stub))}"
+    line = program + cb.to_display(argv).removeprefix(cb.DISPLAY_EXE)
+    if shell == "cmd":
+        run = subprocess.run(f'cmd /d /s /c "{line}"', capture_output=True, text=True, check=True)
+    else:
+        command = [shell, "-NoProfile", "-NonInteractive", "-Command", f"& {line}"]
+        run = subprocess.run(command, capture_output=True, text=True, check=True)
+    assert json.loads(run.stdout) == cb.user_args(argv)
 
 
 def test_mask_secrets() -> None:

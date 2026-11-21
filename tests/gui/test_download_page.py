@@ -22,6 +22,23 @@ def test_looks_like_url() -> None:
     assert not looks_like_url("ftp://x")
 
 
+def test_command_view_fits_its_text_in_a_short_window(qtbot, ctx) -> None:
+    page = make_page(qtbot, ctx)
+    page.url.setText(URL)
+    page.command_section.set_expanded(True)
+    page.resize(760, 420)  # far too short for the whole page: it must scroll, not squeeze
+    view = page.command_view
+    line = view.fontMetrics().lineSpacing()
+    qtbot.waitUntil(lambda: view.verticalScrollBar().maximum() == 0)
+    lines = view.document().documentLayout().documentSize().height()
+    assert lines >= 2
+    assert view.height() >= lines * line
+
+    page.output.template.setText("%(title)s " * 40 + ".%(ext)s")  # past the line limit
+    qtbot.waitUntil(lambda: view.verticalScrollBar().maximum() > 0)
+    assert view.height() < 12 * line
+
+
 def test_controls_update_options_and_command(qtbot, ctx) -> None:
     page = make_page(qtbot, ctx)
     page.url.setText(URL)
@@ -32,7 +49,7 @@ def test_controls_update_options_and_command(qtbot, ctx) -> None:
     assert page.options.audio.format == "opus"
     text = page.command_view.toPlainText()
     assert text.startswith("yt-dlp -f ba/b -x --audio-format opus --audio-quality 128K")
-    assert text.endswith(f"-- {URL}")
+    assert text.endswith(f'-- "{URL}"')
     assert page.mode_stack.currentIndex() == 1
 
     page.audio_format.setCurrentIndex(page.audio_format.findData("flac"))

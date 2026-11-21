@@ -184,6 +184,13 @@ def format_time(seconds: float) -> str:
     return f"{hours}:{minutes:02d}:{secs:02d}" if hours else f"{minutes}:{secs:02d}"
 
 
+def format_hms(seconds: int) -> str:
+    """Format whole seconds as "HH:MM:SS", the form used for clip times."""
+    hours, rest = divmod(max(0, int(seconds)), 3600)
+    minutes, secs = divmod(rest, 60)
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
+
+
 class ValidationError(StrEnum):
     """Problems found by ``validate``; the GUI maps each code to a translated message."""
 

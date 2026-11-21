@@ -4,6 +4,8 @@ Each section shows part of a ``DownloadOptions`` and writes it back: ``load(opti
 fills the controls, ``read(options)`` stores the controls, ``changed`` fires on edits.
 """
 
+import math
+
 from PySide6.QtCore import Signal
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -26,11 +28,14 @@ from easy_ytdlp.core.options import (
     Mode,
     Organize,
     SponsorBlock,
+    format_hms,
+    format_time,
     parse_time,
     template_escapes_folder,
 )
 from easy_ytdlp.core.probe import MediaInfo
 from easy_ytdlp.gui.widgets.common import button, label, set_state
+from easy_ytdlp.gui.widgets.time_input import TimeInput
 
 
 class Section(QWidget):
@@ -132,54 +137,98 @@ class SubtitleSection(Section):
 
 
 class ClipSection(Section):
+    """Clip range as two "HH:MM:SS" fields; the end defaults to "to the end"."""
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        self._duration: int | None = None
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         self.enabled = QCheckBox(self.tr("Download only a part (clip)"))
         layout.addWidget(self.enabled)
         self.fields = QWidget()
-        row = QHBoxLayout(self.fields)
-        row.setContentsMargins(0, 0, 0, 0)
-        self.start = QLineEdit()
-        self.start.setPlaceholderText("0:00")
-        self.end = QLineEdit()
-        self.end.setPlaceholderText(self.tr("end"))
+        fields = QVBoxLayout(self.fields)
+        fields.setContentsMargins(0, 0, 0, 0)
+        row = QHBoxLayout()
+        self.start = TimeInput(self.tr("Clip start"))
+        self.end = TimeInput(self.tr("Clip end"))
+        self.to_end = QCheckBox(self.tr("To the end"))
+        self.to_end.setChecked(True)
         start_label = label(self.tr("From"))
         start_label.setBuddy(self.start)
         end_label = label(self.tr("to"))
         end_label.setBuddy(self.end)
         self.keyframes = QCheckBox(self.tr("Precise cuts (slower, re-encodes)"))
+        self.length = label("", "Caption")
         row.addWidget(start_label)
         row.addWidget(self.start)
         row.addWidget(end_label)
         row.addWidget(self.end)
+        row.addWidget(self.to_end)
+        row.addSpacing(12)
         row.addWidget(self.keyframes)
         row.addStretch(1)
+        fields.addLayout(row)
+        fields.addWidget(self.length)
         layout.addWidget(self.fields)
-        self.hint = label(self.tr("Times as h:mm:ss, m:ss or seconds."), "Caption")
-        layout.addWidget(self.hint)
-        self._watch(self.enabled, self.start, self.end, self.keyframes)
+        self._watch(self.enabled, self.to_end, self.keyframes)
+        self.start.valueChanged.connect(self._emit)
+        self.end.valueChanged.connect(self._emit)
         self.enabled.toggled.connect(self._update)
-        self.start.textChanged.connect(self._validate)
-        self.end.textChanged.connect(self._validate)
+        self.to_end.toggled.connect(self._on_to_end)
+        self.start.valueChanged.connect(self._refresh)
+        self.end.valueChanged.connect(self._refresh)
+        self._update()
+
+    def set_info(self, info: MediaInfo | None) -> None:
+        """Limit the times to the duration of one analyzed video (not of a playlist)."""
+        known = info is not None and not info.is_collection and info.duration
+        self._duration = math.ceil(info.duration) if known else None
+        # The start must leave something to download.
+        self.start.setMaximum(self._duration - 1 if self._duration else None)
+        self.end.setMaximum(self._duration)
+        self._refresh()
+
+    def _on_to_end(self, checked: bool) -> None:
+        if not checked and self.end.value() == 0 and self._duration:
+            self.end.setValue(self._duration)
         self._update()
 
     def _update(self) -> None:
         self.fields.setEnabled(self.enabled.isChecked())
-        self.hint.setVisible(self.enabled.isChecked())
+        self.end.setEnabled(not self.to_end.isChecked())
+        self._refresh()
 
-    def _validate(self) -> None:
-        for edit in (self.start, self.end):
-            text = edit.text().strip()
-            set_state(edit, "invalid", "true" if text and parse_time(text) is None else "false")
+    def _refresh(self) -> None:
+        """Show the clip length and flag an end that is not after the start."""
+        start, end = self.start.value(), self.end.value()
+        bad_range = not self.to_end.isChecked() and end <= start
+        set_state(self.end, "invalid", "true" if bad_range else "false")
+        if bad_range:
+            text = self.tr("The end must be after the start.")
+        elif self.to_end.isChecked():
+            text = (
+                self.tr("Clip length: {time} (to the end)").format(
+                    time=format_time(self._duration - start)
+                )
+                if self._duration
+                else ""
+            )
+        else:
+            text = self.tr("Clip length: {time}").format(time=format_time(end - start))
+        self.length.setText(text)
+        self.length.setVisible(bool(text))
 
     def load(self, options: DownloadOptions) -> None:
         self._loading = True
         clip = options.clip
         self.enabled.setChecked(clip.enabled)
-        self.start.setText(clip.start)
-        self.end.setText(clip.end)
+        # Stored as "HH:MM:SS"; older values ("1:30", "90.5") still parse.
+        start = parse_time(clip.start) if clip.start.strip() else None
+        end = parse_time(clip.end) if clip.end.strip() else None
+        self.start.setValue(math.floor(start or 0))
+        self.end.setValue(math.ceil(end) if end is not None else 0)
+        self.to_end.setChecked(end is None)
         self.keyframes.setChecked(clip.force_keyframes)
         self._loading = False
         self._update()
@@ -187,8 +236,9 @@ class ClipSection(Section):
     def read(self, options: DownloadOptions) -> None:
         clip = options.clip
         clip.enabled = self.enabled.isChecked()
-        clip.start = self.start.text().strip()
-        clip.end = self.end.text().strip()
+        start = self.start.value()
+        clip.start = format_hms(start) if start else ""
+        clip.end = "" if self.to_end.isChecked() else format_hms(self.end.value())
         clip.force_keyframes = self.keyframes.isChecked()
 
 

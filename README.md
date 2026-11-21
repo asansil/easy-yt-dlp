@@ -55,7 +55,7 @@ It installs and updates yt-dlp, FFmpeg and deno for you, verifies every file it 
 To check that the installer is the one published, compare its SHA-256 with the `.sha256` file attached to the same release:
 
 ```powershell
-(Get-FileHash .\EasyYtDlp-Setup-2.0.0.exe -Algorithm SHA256).Hash
+(Get-FileHash .\EasyYtDlp-Setup-2.1.0.exe -Algorithm SHA256).Hash
 ```
 
 ## Usage
